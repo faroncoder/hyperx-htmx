@@ -9,7 +9,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="hyperx-htmx",
-    version="1.1.2",
+    version="1.1.3",
     author="Faron",
     author_email="jpanasuik@gmail.com",
     description="🚀 HyperX - HTMX's Sidekick ⚡ TabX so fast! Lightning-fast HTMX enhancement protocol for Django",
@@ -20,7 +20,6 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
