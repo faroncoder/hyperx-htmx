@@ -1,4 +1,4 @@
-# hyperx-htmx
+# hyperx-htmx - Django
 
 **HyperX – HTMX's Sidekick**
 
