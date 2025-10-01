@@ -5,6 +5,9 @@
 > TabX so fast! – the ultimate HTMX enhancement protocol for Django.
 HyperX supercharges your Django+HTMX projects with a unified X-Tab protocol, attribute builders, decorators, security helpers, and response utilities.
 
+Via PIP : 
+
+`pip install hyperx-htmlx`
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
