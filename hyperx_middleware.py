@@ -1,21 +1,3 @@
-            swap='innerHTML'
-        )
-    })
-
-════════════════════════════════════════════════════════════════════════════════
-🛡️ SECURITY BEST PRACTICES
-════════════════════════════════════════════════════════════════════════════════
-
-✅ Always validate HTMX requests in sensitive views
-✅ Use X-Tab validation for complex interfaces  
-✅ Include CSRF tokens in form submissions
-✅ Monitor security logs for unusual patterns
-✅ Use htmx_login_required for protected views
-✅ Validate expected targets in critical endpoints
-✅ Log all X-Tab parsing for audit trails
-
-════════════════════════════════════════════════════════════════════════════════
-"""
 
 from django.shortcuts import render, redirect
 from django.contrib import messages
@@ -40,27 +22,7 @@ logger_htmx_performance = logging.getLogger('core.htmx_implementation.performanc
 def build_htmx_attrs(request=None, get=None, post=None, put=None, delete=None,
                      target=None, swap=None, trigger=None, headers=None, 
                      push_url=None, vals=None, params=None, xtab=None, **kwargs):
-    """
-    Build HTMX attributes list for template rendering
-    
-    Usage Examples:
-    - hxs = build_htmx_attrs(get='/url/', trigger='load', target='#content')
-    - hxs = build_htmx_attrs(request, post='accounts:login', target='#form')
-    - hxs = build_htmx_attrs(get='core:dashboard', xtab=('profile', 'load', 'view', '1.0'))
-    
-    Args:
-        request: Django request object (optional)
-        get/post/put/delete: HTTP methods - supports URL names with ':'
-        target: HTMX target selector
-        swap: HTMX swap method
-        trigger: HTMX trigger event
-        headers: HTMX headers (JSON string or dict)
-        push_url: Whether to push URL to history
-        vals: HTMX values to include
-        params: HTMX parameters
-        xtab: X-Tab header tuple (tab_name, function, command, version)
-        **kwargs: Additional attributes using snake_case -> hx-kebab-case
-    """
+   
     logger_htmx_attrs.debug(f"Building HTMX attributes: explicit params + {len(kwargs)} kwargs: {list(kwargs.keys())}")
     
     # Handle legacy calls where first parameter might be a kwarg instead of request
@@ -530,4 +492,3 @@ def xtab_required(expected_tab=None, expected_function=None):
         
         return wrapped_view
     return decorator
-
