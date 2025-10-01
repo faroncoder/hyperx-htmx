@@ -1,2 +1,0 @@
-Django>=4.0
-django-htmx>=1.0
