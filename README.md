@@ -7,7 +7,7 @@ HyperX supercharges your Django+HTMX projects with a unified X-Tab protocol, att
 
 Via PIP : 
 
-`pip install hyperx-htmlx`
+`pip install hyperx-htmx`
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
