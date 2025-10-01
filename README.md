@@ -40,19 +40,9 @@ INSTALLED_APPS = [
 ]
 ```
 
-### 3. Git clone HyperX into your config directory
+### 3. Git clone HyperX into your config directory or 
 
-```
-your_project/
-├── manage.py
-├── config/  ← the first parameter of the line in middleware
-│   ├── settings.py
-│   ├── asgi.py
-│   ├── wsgi.py
-│   ├── urls.py
-│   └── hyperx_middleware.py  ← git clone the file into this directory
-└── your_app/
-```
+`pip install hyperx-htmx`
 
 ### 4. Add middleware to settings.py
 
@@ -64,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_htmx.middleware.HtmxMiddleware',  # default implementation
-    'config.hyperx_middleware.HyperXMiddleware',   # add this line 
+    'hyperx.middleware.HyperXMiddleware',   <---------------------------add this line
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
