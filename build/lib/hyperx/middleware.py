@@ -20,7 +20,7 @@ import time
 import logging
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponseBadRequest
-from .htmx_implemention import parse_xtab_header, validate_htmx_request
+from .core import parse_xtab_header, validate_htmx_request
 
 # Middleware-specific loggers
 logger_middleware = logging.getLogger('core.htmx_implementation.middleware')

@@ -1,10 +1,10 @@
-Metadata-Version: 2.4
+Metadata-Version: 2.2
 Name: hyperx-htmx
-Version: 1.0.0
+Version: 1.1.2
 Summary: 🚀 HyperX - HTMX's Sidekick ⚡ TabX so fast! Lightning-fast HTMX enhancement protocol for Django
 Home-page: https://github.com/faroncoder/hyperx-htmx
 Author: Faron
-Author-email: faron@example.com
+Author-email: jpanasuik@gmail.com
 Keywords: htmx django tabx hyperx web development ajax
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Developers
@@ -30,7 +30,6 @@ Dynamic: description
 Dynamic: description-content-type
 Dynamic: home-page
 Dynamic: keywords
-Dynamic: license-file
 Dynamic: requires-dist
 Dynamic: requires-python
 Dynamic: summary
@@ -42,6 +41,9 @@ Dynamic: summary
 > TabX so fast! – the ultimate HTMX enhancement protocol for Django.
 HyperX supercharges your Django+HTMX projects with a unified X-Tab protocol, attribute builders, decorators, security helpers, and response utilities.
 
+Via PIP : 
+
+`pip install hyperx-htmx`
 
 
 [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
@@ -74,19 +76,9 @@ INSTALLED_APPS = [
 ]
 ```
 
-### 3. Git clone HyperX into your config directory
+### 3. Git clone HyperX into your config directory or 
 
-```
-your_project/
-├── manage.py
-├── config/  ← the first parameter of the line in middleware
-│   ├── settings.py
-│   ├── asgi.py
-│   ├── wsgi.py
-│   ├── urls.py
-│   └── hyperx_middleware.py  ← git clone the file into this directory
-└── your_app/
-```
+`pip install hyperx-htmx`
 
 ### 4. Add middleware to settings.py
 
@@ -98,7 +90,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_htmx.middleware.HtmxMiddleware',  # default implementation
-    'config.hyperx_middleware.HyperXMiddleware',   # add this line 
+    'hyperx.middleware.HyperXMiddleware',   <---------------------------add this line
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
