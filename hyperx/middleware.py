@@ -69,6 +69,40 @@ class HyperXMiddleware(MiddlewareMixin):
         
         logger_middleware.info("HyperX Middleware initialized with config: %s", self.config)
         super().__init__(get_response)
+        
+        
+    # ------------------------------------------------------------------
+    # Request processing
+    # ------------------------------------------------------------------
+    def process_request(self, request):
+        """
+        Handle incoming request - detect HTMX/TabX and attach flags.
+        Prevents AttributeError when __call__() invokes it.
+        """
+        try:
+            # detect and attach HTMX / X-Tab flags
+            request.htmx = self._detect_htmx_request(request) if self.auto_validate_htmx else False
+            request.xtab = self._parse_xtab_header(request) if self.auto_parse_xtab else None
+
+            # optional validation
+            if self.auto_validate_htmx and request.htmx:
+                valid = self._validate_htmx_request(request)
+                if not valid:
+                    logger_security.warning(f"Invalid HTMX request blocked: {request.path}")
+                    return HttpResponseBadRequest("Invalid HTMX request")
+
+            # security logging
+            if self.security_logging:
+                self._log_security_info(request)
+
+            # start timer if performance tracking enabled
+            if self.performance_tracking:
+                request._hyperx_start_time = time.time()
+
+        except Exception as e:
+            logger_middleware.error(f"process_request error: {e}")
+            # do not interrupt request processing
+            return None
 
     def __call__(self, request):
         # Start performance tracking
@@ -296,4 +330,3 @@ def add_hyperx_to_request(request):
         f"HyperX manually added to request: htmx={request.htmx}, "
         f"xtab={bool(request.xtab)}"
     )
-
