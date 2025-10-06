@@ -21,8 +21,12 @@ import logging
 from django.utils.deprecation import MiddlewareMixin
 from django.http import HttpResponseBadRequest
 from .core import parse_xtab_header, validate_htmx_request
+import asyncio
 
-# Middleware-specific loggers
+
+
+
+
 logger_middleware = logging.getLogger('core.htmx_implementation.middleware')
 logger_security = logging.getLogger('core.htmx_implementation.security')
 logger_performance = logging.getLogger('core.htmx_implementation.performance')
@@ -90,48 +94,30 @@ class HyperXMiddleware(MiddlewareMixin):
         
         return response
 
-    def process_request(self, request):
-        """Process incoming request - add HTMX and X-Tab detection"""
-        
-        # 1. HTMX Detection
-        request.htmx = self._detect_htmx_request(request)
-        
-        # 2. X-Tab Parsing
-        if self.auto_parse_xtab:
-            request.xtab = self._parse_xtab_header(request)
-        
-        # 3. Security Validation
-        if self.auto_validate_htmx and request.htmx:
-            if not self._validate_htmx_request(request):
-                logger_security.warning(
-                    f"Invalid HTMX request blocked: {request.method} {request.path} "
-                    f"from {request.META.get('REMOTE_ADDR')}"
-                )
-                # Note: We log but don't block - let views decide
-        
-        # 4. Security Logging
-        if self.security_logging:
-            self._log_security_info(request)
-    
     def process_response(self, request, response):
         """Process outgoing response - add HyperX headers if needed"""
+
+        # 🧠 1️⃣  Do nothing if this is an async coroutine
+        if asyncio.iscoroutine(response):
+            return response
         
-        # Add HyperX identification header
+        # 🧠 2️⃣  Normal synchronous path
         response['X-HyperX-Processed'] = 'true'
-        
+
         # Add performance info if tracking enabled
         if self.performance_tracking and hasattr(request, '_hyperx_start_time'):
             duration = time.time() - request._hyperx_start_time
             response['X-HyperX-Duration'] = f"{duration:.3f}s"
-        
+
         # Log response info
         if hasattr(request, 'htmx') and request.htmx:
             logger_middleware.debug(
                 f"HTMX response: {response.status_code} for {request.path} - "
                 f"XTab={bool(getattr(request, 'xtab', None))}"
             )
-        
+
         return response
+
     
     def _detect_htmx_request(self, request):
         """Detect if request is from HTMX"""
@@ -310,3 +296,4 @@ def add_hyperx_to_request(request):
         f"HyperX manually added to request: htmx={request.htmx}, "
         f"xtab={bool(request.xtab)}"
     )
+
