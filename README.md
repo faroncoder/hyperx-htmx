@@ -1,4 +1,5 @@
-🚀 What’s New in 2.1.x
+What’s New in 2.1.x
+
 Declarative HyperX Tags
 
 HyperX 2.1 introduces {% hx %} blocks and <hx:*> declarative syntax, turning complex HTMX code into readable server-side logic.
