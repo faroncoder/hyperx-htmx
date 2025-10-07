@@ -32,7 +32,8 @@ def register_hx_tag(tag_name):
 @register_hx_tag("panel")
 def convert_panel(tag, attrs):
     htmx = build_htmx_attrs(**attrs)
-    return f"<div {' '.join(f'{k}=\"{v}\"' for k,v in htmx.items())}></div>"
+    attrs = ' '.join(f'{k}="{v}"' for k, v in htmx.items())
+    return f"<div {attrs}></div>"
 
 @register_hx_tag("button")
 def convert_button(tag, attrs):
