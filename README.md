@@ -46,9 +46,9 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django_htmx.middleware.HtmxMiddleware",
-    "hyperx.middleware.HyperXMiddleware",          # ✅ add this
-    "hyperx.middleware.HyperXSecurityMiddleware",  # optional
+    "django_htmx.middleware.HtmxMiddleware", # required dependency
+    "hyperx.middleware.HyperXMiddleware", # add this
+    "hyperx.middleware.HyperXSecurityMiddleware", # optional
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
