@@ -1,486 +1,237 @@
-# hyperx-htmx - Django
+🚀 What’s New in 2.1.x
+Declarative HyperX Tags
 
-**HyperX – HTMX's Sidekick**
+HyperX 2.1 introduces {% hx %} blocks and <hx:*> declarative syntax, turning complex HTMX code into readable server-side logic.
 
-> TabX so fast! – the ultimate HTMX enhancement protocol for Django.
-HyperX supercharges your Django+HTMX projects with a unified X-Tab protocol, attribute builders, decorators, security helpers, and response utilities.
+{% load hyperx %}
 
-Via PIP : 
+{% hx %}
+  <hx:button get="lti:admin:course_table_view" target="#intel-container" label="Load Courses" />
+  <hx:panel get="dashboard:refresh" target="#main-panel" swap="innerHTML" />
+{% endhx %}
 
-`pip install hyperx-htmx`
 
+→ Automatically compiles to valid HTMX markup with full CSRF support and TabX headers.
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://python.org)
-[![Django](https://img.shields.io/badge/Django-4.0+-green.svg)](https://djangoproject.com)
-[![HTMX](https://img.shields.io/badge/HTMX-Compatible-orange.svg)](https://htmx.org)
+💡 Features
 
-##  What is HyperX?
+⚡ TabX Protocol: Lightning-fast tab sync via X-Tab headers
 
-- ** TabX Protocol**: Lightning-fast tab management with X-Tab headers
-- ** Unified Attribute Builder**: Single function for all HTMX attributes
-- ** Smart Middleware**: Auto-processing of HTMX requests and X-Tab headers
-- ** Enhanced Security**: Built-in authentication, validation, and threat detection
-- ** Performance Monitoring**: Real-time tracking and comprehensive logging
-- ** Response Helpers**: 15+ HTMX response functions for every use case
+🧠 Declarative Tags: Write <hx:button> instead of hx-get="..."
 
-##  Installation
+🔐 Smart Middleware: Auto-processes HTMX + TabX requests
 
-### 1. Dependency: django-htmx
+🧩 Security Suite: Built-in rate-limit & header validation
 
-```bash
-pip install django-htmx
-```
+🧭 Performance Metrics: Adds duration headers for every HTMX request
 
-### 2. Add to INSTALLED_APPS
+🛠️ Response Helpers: 15+ HTMX utilities for common cases
 
-```python
+⚙️ Installation
+1. Dependencies
+pip install django-htmx hyperx-htmx
+
+2. Django Settings
 INSTALLED_APPS = [
-    "django_htmx",  # default implementation
+    "django_htmx",
+    "hyperx",
 ]
-```
 
-### 3. Git clone HyperX into your config directory or 
+3. Middleware Order
 
-`pip install hyperx-htmx`
+(Always after django_htmx.middleware.HtmxMiddleware)
 
-### 4. Add middleware to settings.py
-
-```python
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django_htmx.middleware.HtmxMiddleware',  # default implementation
-    'hyperx.middleware.HyperXMiddleware',   <---------------------------add this line
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django_htmx.middleware.HtmxMiddleware",
+    "hyperx.middleware.HyperXMiddleware",          # ✅ add this
+    "hyperx.middleware.HyperXSecurityMiddleware",  # optional
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
 ]
-```
 
-### 5. Add HyperX configuration to settings.py
+🧠 Template Usage
+Direct Tags
+{% load hyperx %}
+{% hx %}
+  <hx:button get="users:list" target="#table" label="Refresh" />
+  <hx:panel get="dashboard:stats" swap="outerHTML" />
+{% endhx %}
 
-```python
-# HyperX Middleware Configuration
+Inline Attributes
+<button {{ attrs|htmx_attrs }}>Submit</button>
+
+🧩 Middleware Configuration
 HYPERX_MIDDLEWARE = {
-    'AUTO_VALIDATE_HTMX': True,      # Auto-validate HTMX requests
-    'AUTO_PARSE_XTAB': True,         # Auto-parse X-Tab headers
-    'SECURITY_LOGGING': True,        # Enhanced security logging
-    'PERFORMANCE_TRACKING': True,    # Track request performance
-    'STRICT_XTAB_VALIDATION': False, # Strict X-Tab format validation
+    'AUTO_VALIDATE_HTMX': True,
+    'AUTO_PARSE_XTAB': True,
+    'SECURITY_LOGGING': True,
+    'PERFORMANCE_TRACKING': True,
+    'STRICT_XTAB_VALIDATION': False,
 }
 
 HYPERX_SECURITY = {
-    'RATE_LIMITING': True,           # Enable rate limiting
-    'PATTERN_DETECTION': True,       # Detect suspicious patterns
-    'AUTO_BLOCKING': False,          # Auto-block malicious requests
-    'MAX_REQUESTS_PER_MINUTE': 60,   # Rate limit threshold
-}
-```
-
-**Voilà! You are done.**
-
-## Usage
-
-### HTML Templates
-
-```html
-<!-- Method 1: Direct attribute rendering -->
-<div {% for attr in hx_attrs %}{{ attr.name }}="{{ attr.value }}"{% endfor %}>
-<button {% for attr in hx_attrs %}{{ attr.name }}="{{ attr.value }}"{% endfor %}>
-<a {% for attr in hx_attrs %}{{ attr.name }}="{{ attr.value }}"{% endfor %}> 
-
-<!-- Method 2: Advanced (easier once you understand the above) -->
-<button {{ hx_attrs|htmx_attrs }}>Load Data</button>
-```
-
-### Views.py
-
-```python
-attrs = build_htmx_attrs(
-    get='api:refresh',
-    target='#content',
-    trigger='load',
-    on_before_request='showLoader()',
-    on_after_request='hideLoader()',
-    on_response_error='handleError(event)'
-)
-```
-
-**That's it.** You will see the content get loaded without hardcoding the HTMX markers in HTML.
-
-## Key Features
-
-###  Smart Middleware (Auto-Processing!)
-
-HyperX Middleware automatically handles HTMX detection and X-Tab parsing:
-
-```python
-# settings.py
-MIDDLEWARE = [
-    ...
-    'your_app.utils.hyperx_middleware.HyperXMiddleware',
-    ...
-]
-
-# Configuration
-HYPERX_MIDDLEWARE = {
-    'AUTO_VALIDATE_HTMX': True,      # Auto-validate HTMX requests
-    'AUTO_PARSE_XTAB': True,         # Auto-parse X-Tab headers
-    'SECURITY_LOGGING': True,        # Enhanced security logging
-    'PERFORMANCE_TRACKING': True,    # Track request performance
+    'RATE_LIMITING': True,
+    'PATTERN_DETECTION': True,
+    'AUTO_BLOCKING': False,
+    'MAX_REQUESTS_PER_MINUTE': 60,
 }
 
-# In your views - everything is automatic!
-def my_view(request):
-    if request.htmx:        # Auto-detected!
-        if request.xtab:    # Auto-parsed!
-            tab_name = request.xtab['tab']
-            return JsonResponse({'tab': tab_name})
-```
+🧰 View Integration
+from hyperx.core import build_htmx_attrs
+from hyperx.decorators import xtab_required
 
-### ⚡ TabX Protocol (Revolutionary!)
+def dashboard_view(request):
+    if request.htmx:
+        return render_htmx(request, "partials/dashboard.html", {
+            "attrs": build_htmx_attrs(get="dashboard:update", target="#main")
+        })
+    return render(request, "dashboard.html")
 
-The TabX protocol uses X-Tab headers for lightning-fast tab management:
-
-```python
-# Generate TabX headers automatically
+⚡ TabX Protocol
+# TabX header auto-generation
 attrs = build_htmx_attrs(
     get='profile:load',
-    target='#tab-content',
-    xtab=('profile', 'load', 'view', '1.0')
+    target='#profile',
+    xtab=('profile', 'view', 'load', '1.0')
 )
-# Creates: X-Tab: "profile:1.0:load:view"
 
-# Parse TabX in views
+# TabX view validation
 @xtab_required(expected_tab='profile')
 def profile_view(request):
-    tab_data = request.xtab  # Automatically parsed!
-    return JsonResponse({'tab': tab_data['tab']})
-```
+    return JsonResponse({'tab': request.xtab})
 
-###  Unified Attribute Builder
+🧱 Declarative Template Engine (Advanced)
+Element	Description	Example
+<hx:button>	Creates <button> with automatic HTMX mapping	<hx:button get="api:reload" label="Reload"/>
+<hx:panel>	Generates <div> blocks with hx-get / hx-target	<hx:panel get="dashboard" swap="innerHTML" />
+<hx:xtab>	Adds TabX headers automatically	<hx:xtab name="profile" function="view" />
+🔒 Security Practices
 
-One function for ALL HTMX attributes:
+Always include CSRF via {% csrf_token %} or automatic injection
 
-```python
-attrs = build_htmx_attrs(
-    post='forms:submit',
-    target='#form-container',
-    swap='outerHTML',
-    trigger='submit',
-    confirm='Submit form?',
-    headers={'X-CSRFToken': '{{ csrf_token }}'},
-    on_before_request='showSpinner()',
-    on_after_request='hideSpinner()',
-    indicator='#loading'
-)
-```
+Use @htmx_login_required for sensitive views
 
-###  Enhanced Security
+Validate expected targets in critical endpoints
 
-Built-in authentication, validation, and threat protection:
+Monitor hyperx.log for anomalies
 
-```python
-# Middleware provides automatic security
-HYPERX_SECURITY = {
-    'RATE_LIMITING': True,           # Prevent HTMX request flooding
-    'PATTERN_DETECTION': True,       # Detect suspicious patterns
-    'AUTO_BLOCKING': False,          # Auto-block malicious requests
-    'MAX_REQUESTS_PER_MINUTE': 60,   # Rate limit threshold
-}
+📈 Performance
 
-# Decorators for additional protection
-@htmx_login_required  # Shows inline login for HTMX, redirects for regular requests
-@xtab_required(expected_tab='admin', expected_function='manage')
-def admin_view(request):
-    # Middleware already validated security!
-    return render(request, 'admin_panel.html')
-```
+Smart caching for repeated HTMX attributes
 
-###  Response Helpers
+Duration tracking in X-HyperX-Duration header
 
-15+ response helpers for every scenario:
+Non-blocking async-safe middleware
 
-```python
-# Redirects & Navigation
-return hx_redirect('/dashboard/')
-return hx_refresh()
-return hx_location('/profile/', target='#main')
+Log grouping for real-time profiling
 
-# URL Management
-return hx_push_url('/new-page/')
-return hx_replace_url('/updated-page/')
+🧡 License & Credits
 
-# Dynamic Targeting
-return hx_retarget('#different-element')
-return hx_reswap('beforeend')
+MIT License © 2025 Jeff Panasuik
+Built with love for the Django + HTMX community.
+Inspired by htmx.org
+ and the UNIX way.
 
-# Event Triggering
-return hx_trigger('notification', {'message': 'Success!'})
-return hx_trigger({
-    'notification': {'type': 'success'},
-    'analytics': {'action': 'form_submit'},
-    'ui-update': {'refresh_menu': True}
-})
-```
+----------------------
+Design Philosophy — Server is the Source of Truth
 
-##  Documentation
+HyperX is not a JavaScript framework.
+It’s a new declarative language that lives inside Django’s templating engine —
+a way for the server itself to describe interactivity without handing control to the client.
 
-### Complete Function Reference
+“If the browser can lie, the server must speak truth.”
 
-#### Core Utilities
-- **`build_htmx_attrs()`** - Unified HTMX attribute generation
-- **`htmx_form_submit()`** - Pre-configured form submission
-- **`htmx_infinite_scroll()`** - Infinite scroll setup
-- **`parse_xtab_header()`** - Parse TabX headers
-- **`validate_xtab_request()`** - Validate TabX requests
-- **`@xtab_required`** - Decorator for TabX validation
-- **`@htmx_login_required`** - HTMX-aware authentication
-- **`render_htmx()`** - Smart template rendering
-- **`is_htmx_request()`** - Request type detection
-- **`validate_htmx_request()`** - Enhanced request validation
+That’s the core belief behind HyperX.
 
-#### Middleware Classes
-- **`HyperXMiddleware`** - Auto-processing HTMX and X-Tab headers
-- **`HyperXSecurityMiddleware`** - Enhanced security and threat protection
-- **`add_hyperx_to_request()`** - Manual middleware integration utility
+Modern web frameworks often treat the server as a data faucet and the browser as the brain.
+HyperX reverses that: the server defines what happens, where it happens, and how it reacts — in pure HTML.
 
-### Response Helpers
+Declarative by Design
 
-| Function | Purpose | Example |
-|--------------------|-----------------------  |-------------------------------
-| `hx_redirect()`    | Navigate without reload | `hx_redirect('/dashboard/')` 
-| `hx_refresh()`     | Force page refresh      | `hx_refresh()` 
-| `hx_location()`    | Navigate with options   | `hx_location('/profile/', target='#main')` 
-| `hx_push_url()`    | Add to history          | `hx_push_url('/new-page/')` 
-| `hx_replace_url()` | Replace history         | `hx_replace_url('/updated/')` 
-| `hx_retarget()`    | Change target           | `hx_retarget('#new-target')` 
-| `hx_reswap()`      | Change swap method      | `hx_reswap('beforeend')` 
-| `hx_trigger()`     | Trigger events          | `hx_trigger('saved', {'id': 123})` 
+Django templates were never meant to evolve — until now.
+HyperX transforms them into a reactive DSL, powered by tags like:
 
-## Real-World Examples
+{% hx %}
+  <hx:button get="dashboard:update" target="#main" />
+  <hx:panel get="stats:overview" swap="outerHTML" trigger="every 30s" />
+{% endhx %}
 
-### Complete Dashboard with TabX + Middleware
 
-```python
-# views.py - With HyperX Middleware
-@htmx_login_required
-@xtab_required(expected_tab='dashboard')
-def dashboard_view(request):
-    # Middleware automatically parsed request.xtab!
-    tab_function = request.xtab['function']
-    
-    if tab_function == 'refresh':
-        data = get_dashboard_data()
-        return render_htmx(request, 'dashboard/refresh.html', {
-            'data': data,
-            'refresh_attrs': build_htmx_attrs(
-                get='dashboard:refresh',
-                target='#dashboard-content',
-                trigger='every 30s',
-                xtab=('dashboard', 'refresh', 'auto', '1.1')
-            ),
-            # Middleware provides performance info in response headers:
-            # X-HyperX-Processed: true
-            # X-HyperX-Duration: 0.045s
-        })
-    
-    return render_htmx(request, 'dashboard/main.html')
+The result is compiled by the server into valid HTMX attributes — no manual wiring, no brittle JS.
+This approach collapses the distance between backend logic and frontend behavior,
+making HTML truly self-describing again.
 
-# Simplified version without decorators
-def simple_dashboard_view(request):
-    # Middleware handles all the heavy lifting!
-    if request.htmx and request.xtab:
-        if request.xtab['tab'] == 'dashboard':
-            return render_htmx(request, 'dashboard_content.html')
-    
-    return render_htmx(request, 'dashboard_full.html')
-```
+---The Unix Principle, Applied to the Web
 
-### Interactive Form with Validation
+Every part of HyperX follows the Unix philosophy:
 
-```python
-def contact_form_view(request):
-    if request.method == 'POST':
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return hx_trigger('form-success', {
-                'message': 'Message sent successfully!',
-                'redirect_url': '/thank-you/'
-            })
-    else:
-        form = ContactForm()
-    
-    return render(request, 'contact_form.html', {
-        'form': form,
-        'submit_attrs': build_htmx_attrs(
-            post='contact:submit',
-            target='#contact-form',
-            swap='outerHTML',
-            on_before_request='disableSubmit()',
-            on_after_request='enableSubmit()',
-            indicator='#form-loading'
-        )
-    })
-```
+“Do one thing well, and speak a simple language.”
 
-### Live Search with Debouncing
+Middleware handles truth: security, validation, and flow.
 
-```python
-def search_view(request):
-    query = request.GET.get('q', '')
-    if query:
-        results = search_database(query)
-        return render(request, 'search_results.html', {'results': results})
-    
-    return render(request, 'search.html', {
-        'search_attrs': build_htmx_attrs(
-            get='search:results',
-            target='#search-results',
-            trigger='keyup changed delay:500ms',
-            vals='{"live": true}',
-            indicator='#search-loading'
-        )
-    })
-```
+Templatetags handle meaning: declarative intent.
 
-##  Configuration
+HTMX handles motion: the minimal, composable runtime.
 
-### Middleware Setup (settings.py)
+Together, they form a pipeline where HTML, not JavaScript, becomes the API boundary.
 
-```python
-# Add HyperX Middleware
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    
-    # HyperX Middleware - Add here
-    'your_app.utils.hyperx_middleware.HyperXMiddleware',
-    'your_app.utils.hyperx_middleware.HyperXSecurityMiddleware',  # Optional
-    
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+---Security by Composition
 
-# HyperX Configuration
-HYPERX_MIDDLEWARE = {
-    'AUTO_VALIDATE_HTMX': True,      # Auto-validate HTMX requests
-    'AUTO_PARSE_XTAB': True,         # Auto-parse X-Tab headers
-    'SECURITY_LOGGING': True,        # Enhanced security logging
-    'PERFORMANCE_TRACKING': True,    # Track request performance
-    'STRICT_XTAB_VALIDATION': False, # Strict X-Tab format validation
-}
+HyperX treats requests as conversations between trusted peers.
+Every interaction is validated, introspected, and logged — not assumed safe.
+That’s why it auto-injects CSRF meta tags, validates TabX headers,
+and guards HTMX requests with intelligent middleware.
 
-# Enhanced Security (Optional)
-HYPERX_SECURITY = {
-    'RATE_LIMITING': True,           # Enable rate limiting
-    'PATTERN_DETECTION': True,       # Detect suspicious patterns
-    'AUTO_BLOCKING': False,          # Auto-block malicious requests
-    'MAX_REQUESTS_PER_MINUTE': 60,   # Rate limit threshold
-}
-```
+---Framework-Agnostic Evolution
 
-### Logging Setup (settings.py)
+HyperX doesn’t compete with Django — it amplifies it.
+It doesn’t replace HTMX — it clarifies it.
+And it doesn’t chase trends — it returns web to fundamentals:
+simple, inspectable, declarative HTML, backed by a strong, honest server.
 
-```python
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': 'hyperx.log',
-        },
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'core.htmx_implementation.main': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'core.htmx_implementation.security': {
-            'handlers': ['file'],
-            'level': 'WARNING',
-            'propagate': False,
-        },
-        'core.htmx_implementation.performance': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'core.htmx_implementation.middleware': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-    },
-}
-```
+---Philosophical Credits — Standing on the Shoulders of Simplicity
 
-##  Security Best Practices
+“Every revolution begins with a return to first principles.”
 
- **Always validate HTMX requests** in sensitive views  
- **Use TabX validation** for complex interfaces  
- **Include CSRF tokens** in form submissions  
- **Monitor security logs** for unusual patterns  
- **Use `@htmx_login_required`** for protected views  
- **Validate expected targets** in critical endpoints  
- **Log all TabX parsing** for audit trails  
+HyperX exists because the web forgot its roots.
+It’s a reminder that HTML is already declarative,
+and that interactivity belongs to the server, not the browser.
 
-##  Performance Features
+This work stands on the quiet brilliance of others:
 
-- **Smart Middleware**: Auto-processing with minimal overhead
-- **Smart URL Reversal**: Automatic Django URL name resolution
-- **Real-time Monitoring**: Request duration tracking in headers
-- **Efficient Logging**: 8 specialized logger categories including middleware
-- **Request Validation**: Lightning-fast HTMX request detection
-- **Attribute Caching**: Optimized attribute generation
-- **Memory Efficient**: Minimal overhead design
-- **Security Optimization**: Intelligent threat detection without blocking performance
+Aaron Gustafson — for proving that hypermedia can still evolve,
+and for creating HTMX, the most humane frontend library of this decade.
 
-##  Contributing
+Guido van Rossum — for giving us Python, where elegance is not optional.
 
-HyperX is open source and contributions are welcome!
+Adrian Holovaty & Jacob Kaplan-Moss — for Django, the web framework that refused to compromise.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+Dennis Ritchie & Ken Thompson — for Unix, the one philosophy every good system still bows to.
 
-##  License
+And finally — to the curious, the tinkerers, the ones who open the terminal and ask “What if the server could talk in HTML again?” —
+HyperX was made for you.
 
-MIT License - see [LICENSE](LICENSE) file for details.
+---“The server is truth. The template is language. The web is alive again.”
 
-##  Acknowledgments
+🧑‍💻 Creator’s Note — Making Silence Speak in Code
 
-- **HTMX Team** - For creating the amazing HTMX library
-- **Django Community** - For the robust framework
-- **Contributors** - Everyone who helps make HyperX better
+I wrote my first shell script at age 9, on a machine that barely ran.  No frameworks. No noise. Just logic and blinking underscore light.
 
-##  Support
+As a Deaf developer, silence became my native protocol — and over the years, I learned that code, like language, doesn’t need sound to communicate truth.
+It needs clarity, structure, and integrity.  Unix is the perfect laws and it gave that to systems, and even to me.
 
-- **Documentation**: Full examples included in source code
-- **Issues**: Report bugs via GitHub issues
-- **Discussions**: Join the community discussions
+HyperX is my way of honoring that.
+It’s the moment where Django, HTMX, and the Unix philosophy finally shake hands — a framework that listens, even when it doesn’t hear.
 
----
+---Django Team: I hope this elevates Django to next level.  :)
 
-** HyperX - HTMX's Sidekick ⚡**  
-*TabX so fast! Making Django + HTMX development lightning fast and incredibly intuitive.*
+“When words fall silent, systems still speak.”
 
----
-
-Made with ❤️ for the Django and HTMX communities.
+– Jeff Panasuik
+Founder of SignaVision Solutions Inc.
+Creator of HyperX
+Toronto, Canada 🇨🇦
