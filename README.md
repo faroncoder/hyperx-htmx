@@ -2,7 +2,7 @@ What’s New in 2.1.x
 
 Declarative HyperX Tags
 
-HyperX 2.1 introduces {% hx %} blocks and <hx:*> declarative syntax, turning complex HTMX code into readable server-side logic.
+→ HyperX 2.1 introduces {% hx %} blocks and <hx:*> declarative syntax, turning complex HTMX code into readable server-side logic.
 ```
 {% load hyperx %}
 
@@ -14,16 +14,16 @@ HyperX 2.1 introduces {% hx %} blocks and <hx:*> declarative syntax, turning com
 
 → Automatically compiles to valid HTMX markup with full CSRF support and TabX headers.
 
----Features
+→ Features
 1. TabX Protocol: Lightning-fast tab sync via X-Tab headers
 2. Declarative Tags: Write <hx:button> instead of hx-get="..."
 3. Smart Middleware: Auto-processes HTMX + TabX requests
 4. Security Suite: Built-in rate-limit & header validation
 
- ---erformance Metrics: Adds duration headers for every HTMX request
+ → Performance Metrics: Adds duration headers for every HTMX request
 Response Helpers: 15+ HTMX utilities for common cases
 
-⚙️ Installation
+→ Installation
 1. Dependencies
 `pip install django-htmx hyperx-htmx`
 
@@ -34,9 +34,7 @@ Response Helpers: 15+ HTMX utilities for common cases
     "hyperx",
 ]
 `
-4. Middleware Order
-
-(Always after django_htmx.middleware.HtmxMiddleware)
+3. Middleware Order
 ```
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -50,22 +48,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 ```
----Templatetag Usage
-`{% load hyperx %}`
-
-Example
-```
-{% load hyperx %}
-{% hx %}
-  <hx:button get="users:list" target="#table" label="Refresh" />
-  <hx:panel get="dashboard:stats" swap="outerHTML" />
-{% endhx %}
-```
-
-Inline Attributes
-`<button {{ attrs|htmx_attrs }}>Submit</button>`
-
----Middleware Configuration in settings.py
+4. Settings.py hyperx configration
 ```
 HYPERX_MIDDLEWARE = {
     'AUTO_VALIDATE_HTMX': True,
@@ -82,7 +65,25 @@ HYPERX_SECURITY = {
     'MAX_REQUESTS_PER_MINUTE': 60,
 }
 ```
----View Integration
+
+5. Usage
+
+→ Templatetag Usage
+`{% load hyperx %}`
+
+Example
+```
+{% load hyperx %}
+{% hx %}
+  <hx:button get="users:list" target="#table" label="Refresh" />
+  <hx:panel get="dashboard:stats" swap="outerHTML" />
+{% endhx %}
+```
+
+→ Inline Attributes
+`<button {{ attrs|htmx_attrs }}>Submit</button>`
+
+→ View Integration
 ```
 from hyperx.core import build_htmx_attrs
 from hyperx.decorators import xtab_required
@@ -102,21 +103,21 @@ attrs = build_htmx_attrs(
     xtab=('profile', 'view', 'load', '1.0')
 )
 ```
----TabX view validation
+→ TabX view validation
 ```
 @xtab_required(expected_tab='profile')
 def profile_view(request):
     return JsonResponse({'tab': request.xtab})
 ```
 
----Declarative Template Engine (Advanced)
-Element	Description	Example
+→ Declarative Template Engine (Advanced)
 
 `<hx:button>`	Creates <button> with automatic HTMX mapping	<hx:button get="api:reload" label="Reload"/>
 `<hx:panel>`	Generates <div> blocks with hx-get / hx-target	<hx:panel get="dashboard" swap="innerHTML" />
 `<hx:xtab>`	Adds TabX headers automatically	<hx:xtab name="profile" function="view" />
 
- ---Security Practices
+
+→ Security Practices
 
 - Always include CSRF via {% csrf_token %} or automatic injection
 - Use `@htmx_login_required` for sensitive views
@@ -125,22 +126,21 @@ Element	Description	Example
 - See `HX_Templating_Delcarations.md` and `HX_Commands_Reference.md` for more examples
 to use under your sleeve.  :)
 
----Performance
+→ Performance
 
 - Smart caching for repeated HTMX attributes
 - Duration tracking in X-HyperX-Duration header
 - Non-blocking async-safe middleware
 - Log grouping for real-time profiling
 
----License & Credits
+→ License & Credits
 
 MIT License © 2025 Jeff Panasuik
 Built with love for the Django + HTMX community.
 Inspired by htmx.org and honoring unix.
 
 ----------------------
-Design Philosophy — Server is the Source of Truth
-
+→ Design Philosophy — Server is the Source of Truth
 HyperX is not a JavaScript framework.
 It’s a new declarative language that lives inside Django’s templating engine —
 a way for the server itself to describe interactivity without handing control to the client.
@@ -151,24 +151,20 @@ That’s the core belief behind HyperX.
 Modern web frameworks often treat the server as a data faucet and the browser as the brain.
 HyperX reverses that: the server defines what happens, where it happens, and how it reacts — in pure HTML.
 
----Declarative by Design
-
+→ Declarative by Design
 Django templates were never meant to evolve — until now.
 HyperX transforms them into a reactive DSL, powered by tags like:
-
 `
 {% hx %}
   <hx:button get="dashboard:update" target="#main" />
   <hx:panel get="stats:overview" swap="outerHTML" trigger="every 30s" />
 {% endhx %}
 `
-
 The result is compiled by the server into valid HTMX attributes — no manual wiring, no brittle JS.
 This approach collapses the distance between backend logic and frontend behavior,
 making HTML truly self-describing again.
 
----The Unix Principle - and Unix always wins.
-
+→ The Unix Principle - and Unix always wins.
 Every part of HyperX follows the Unix philosophy:
 - “Do one thing well, and speak a simple language.”
 - Middleware handles truth: security, validation, and flow.
@@ -177,29 +173,25 @@ Every part of HyperX follows the Unix philosophy:
 
 Together, they form a pipeline where HTML, not JavaScript, becomes the API boundary.
 
----Security by Composition
-
+→ Security by Composition
 Every request is a conversation, not an assumption.
 Auto-injects CSRF
 Validates TabX headers
 Guards HTMX flows via intelligent middleware
 No silent trust — only verified intent.
 
----Framework-Agnostic Evolution
-
-HyperX doesn’t replace Django.
-It is not a new invention.
-It connects and amplifies Django.
-It doesn’t compete with HTMX — it clarifies it.
-It doesn’t chase trends — it returns to fundamentals: unix principles.
+→ Framework-Agnostic Evolution
+- HyperX doesn’t replace Django.
+- It is not a new invention.
+- It connects and amplifies Django.
+- It doesn’t compete with HTMX — it clarifies it.
+- It doesn’t chase trends — it returns to fundamentals: unix principles.
 
 Simple. Inspectable. Declarative HTML.
 Backed by a strong, honest server.
 
-----Philosophical Credits
-
+→ Philosophical Credits
 “Every revolution begins with a return to first principles.”
-
 HyperX exists because the web forgot its roots.
 It’s a reminder that HTML is already declarative,
 and interactivity belongs to the server, not the browser.
@@ -216,14 +208,13 @@ To the tinkerers — for asking “What if the server could talk in HTML again?�
 The template is language.
 The web is alive again.”
 
----Creator’s Note — Making Silence Speak in Code
-
+→ Creator’s Note — Making Silence Speak in Code
 “When words fall silent, systems still speak.” — Jeff Panasuik
 
 The coding world was first introduced to me at age 9
 when I discovered a terminal with a blinking underscore cursor
-emitting so much light making my dark room visible.  Unknowing
-that I was embracing shell scripting language, I learned
+emitting so much light making my dark room visible in nighttime.  
+Unknowing that I was embracing shell scripting language, I learned
 the laws of Unix.  
 
 Unix mindset has become part of my life.
@@ -237,6 +228,7 @@ django and server the "ability to speak".
 Motto: "If you build it in unix way, unix always wins"
 
 Jeff Panasuik
+Faroncoder
 Founder, SignaVision Solutions Inc.
 Creator of HyperX
 Toronto, Canada 🇨🇦
