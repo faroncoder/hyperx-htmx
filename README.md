@@ -2,6 +2,8 @@
 ![Django](https://img.shields.io/badge/framework-django-green.svg)
 ![htmx](https://img.shields.io/badge/library-htmx-blueviolet)
 ![PyPI](https://img.shields.io/pypi/v/your-package-name.svg)
+→ Built on Python 3.12
+
 
 
 What’s New in 2.1.x
