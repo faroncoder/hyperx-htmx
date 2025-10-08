@@ -130,7 +130,7 @@ def profile_view(request):
 
 → Security Practices
 ---
-* Always include CSRF via {% csrf_token %} or automatic injection
+* Always include CSRF via `{% csrf_token %}` or automatic injection
 * Use `@htmx_login_required` for sensitive views
 * Validate expected targets in critical endpoints
 * Monitor `hyperx.log` for anomalies
