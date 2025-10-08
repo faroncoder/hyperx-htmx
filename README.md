@@ -1,6 +1,7 @@
 ![Python](https://img.shields.io/badge/language-python-blue.svg)
 ![Django](https://img.shields.io/badge/framework-django-green.svg)
 ![htmx](https://img.shields.io/badge/library-htmx-blueviolet)
+![PyPI](https://img.shields.io/pypi/v/your-package-name.svg)
 
 
 What’s New in 2.1.x
@@ -36,7 +37,7 @@ Response Helpers: 15+ HTMX utilities for common cases
 `INSTALLED_APPS = [
    ...
    "django_htmx",
-    "hyperx",
+   "hyperx",
 ]
 `
 3. Middleware Order
