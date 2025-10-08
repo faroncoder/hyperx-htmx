@@ -47,11 +47,13 @@ def convert_xtab(tag, attrs):
     headers = {"X-Tab": f"{attrs.get('name')}:{attrs.get('version','1')}:{attrs.get('function')}:{attrs.get('command')}"}
     htmx = build_htmx_attrs(**attrs)
     htmx["hx-headers"] = json.dumps(headers)
-    return f"<div {' '.join(f'{k}=\"{v}\"' for k,v in htmx.items())}></div>"
+    attrs = ' '.join(f'{k}="{v}"' for k, v in htmx.items())
+    return f"<div {attrs}></div>"
 
 def convert_generic(tag, attrs):
     htmx = build_htmx_attrs(**attrs)
-    return f"<div {' '.join(f'{k}=\"{v}\"' for k,v in htmx.items())}></div>"
+    attrs_str = ' '.join(f'{k}="{v}"' for k, v in htmx.items())
+    return f"<div {attrs_str}></div>"
 
 
 
