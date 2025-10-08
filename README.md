@@ -123,9 +123,9 @@ def profile_view(request):
 
 → Declarative Template Engine (Advanced)
 ---
-`<hx:button>`	Creates <button> with automatic HTMX mapping	`<hx:button get="api:reload" label="Reload"/>`
-`<hx:panel>`	Generates an element  `<div hx-get / hx-target	<hx:panel get="dashboard" swap="innerHTML" ></div>`
-`<hx:xtab>`	Adds TabX headers automatically	`<hx:xtab name="profile" function="view" />`
+* `<hx:button>`	Creates <button> with automatic HTMX mapping	`<hx:button get="api:reload" label="Reload"/>`
+* `<hx:panel>`	Generates an element  `<div hx-get / hx-target	<hx:panel get="dashboard" swap="innerHTML" ></div>`
+* `<hx:xtab>`	Adds TabX headers automatically	`<hx:xtab name="profile" function="view" />`
 
 
 → Security Practices
