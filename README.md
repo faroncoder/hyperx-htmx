@@ -256,8 +256,11 @@ django and server the "ability to speak".
 
 Personal Motto: If you build it in unix way, unix always wins
 
-Jeff Panasuik
+
 Faroncoder
+
 Founder, SignaVision Solutions Inc.
+
 Creator of HyperX
+
 Toronto, Canada 🇨🇦
