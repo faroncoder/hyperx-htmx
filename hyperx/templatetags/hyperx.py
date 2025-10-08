@@ -39,7 +39,8 @@ def convert_panel(tag, attrs):
 def convert_button(tag, attrs):
     label = attrs.get("label", "Action")
     htmx = build_htmx_attrs(**attrs)
-    return f"<button {' '.join(f'{k}=\"{v}\"' for k,v in htmx.items())}>{label}</button>"
+    attrs = ' '.join(f'{k}="{v}"' for k, v in htmx.items())
+    return f"<button {attrs}>{label}</button>"
 
 @register_hx_tag("xtab")
 def convert_xtab(tag, attrs):
