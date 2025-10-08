@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hyperx-htmx",
-    version="2.1.3",
+    version="2.1.4",
     description="Declarative HTMX/TabX enhancement for Django — HyperX Middleware & Template Tags",
     author="Jeff Panasuik",
     author_email="jeff.panasuik@gmail.com",
