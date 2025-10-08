@@ -1,3 +1,8 @@
+![Python](https://img.shields.io/badge/language-python-blue.svg)
+![Django](https://img.shields.io/badge/framework-django-green.svg)
+![htmx](https://img.shields.io/badge/library-htmx-blueviolet)
+
+
 What’s New in 2.1.x
 
 Declarative HyperX Tags
