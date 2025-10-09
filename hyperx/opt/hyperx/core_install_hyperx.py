@@ -74,8 +74,8 @@ HYPERX_SECURITY = {
                 )
             else:
                 print("⚠️  flake8 not found, skipping syntax check")
-
-                    return True
+                return True
+            
         except Exception as e:
             print(f"❌ Failed to create backup: {e}")
             return False
