@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hyperx-htmx",
-    version="3.2.7",
+    version="3.2.8",
     author="Jeff Panasuik",
     author_email="jeff.panasuik@gmail.com",
     description="Declarative HTMX + Elementy framework for Django",
