@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hyperx-htmx",
-    version="3.2.3",
+    version="3.2.4",
     author="Jeff Panasuik",
     author_email="jeff.panasuik@gmail.com",
     description="Declarative HTMX + Elementy framework for Django",
@@ -30,6 +30,12 @@ setup(
     ],
     entry_points={
         # ✅ Modern Django app autodiscovery (no default_app_config needed)
+        "console_scripts" :[
+            "hyperx-autodiscover = hyperx:autodiscover",
+            "hyperx-install = hyperx.management.commands.install_hyperx:Command.run",
+            "hyperx-check = hyperx.management.commands.check_hyperx:Command.run",
+        ],
+
         "django.apps": [
             "hyperx = hyperx.apps.HyperXConfig",
         ],
