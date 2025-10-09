@@ -11,6 +11,7 @@ import ast
 import argparse
 from pathlib import Path
 from typing import List, Tuple, Optional, Union
+import json
 
 
 class HyperXInstaller:
