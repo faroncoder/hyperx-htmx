@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
-"""
-🚀 HyperX Auto-Installer for Django Projects
-=============================================
-"""
+import platform
+import shutil
+import subprocess
+import django
 from datetime import datetime
 import os
 import sys
-import re
-import ast
 import argparse
 from pathlib import Path
-from typing import List, Tuple, Optional, Union
 import json
-from datetime import datetime
+import logging
+import time
 from django.conf import settings
 
 
@@ -65,7 +63,7 @@ HYPERX_SECURITY = {
             self.backup_path.write_text(content)
             print(f"✅ Backup created: {self.backup_path}")
             
-            import shutil, subprocess
+        
             if shutil.which("flake8"):
                 subprocess.run(
                     ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
@@ -251,7 +249,7 @@ HYPERX_SECURITY = {
         print("✅ Added HyperX configuration")
         return content, True
         
-        import shutil, subprocess
+        
         if shutil.which("flake8"):
             subprocess.run(
                 ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
@@ -276,7 +274,7 @@ HYPERX_SECURITY = {
             "# The following changes were made:",
         ]
         
-            import subprocess
+       
 
             if changes_made.get('apps_added'):
                 disclosure_lines.extend([
@@ -304,8 +302,7 @@ HYPERX_SECURITY = {
                     
             def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
                 """Add disclosure comment explaining what HyperX installer modified."""
-                import shutil
-                import subprocess
+
 
                 # Check if disclosure already exists
                 if "HyperX Auto-Installer Disclosure" in content:
@@ -503,10 +500,7 @@ Handles:
 ──────────────────────────────────────────────
 """
 # Additional imports for system-level installation
-import subprocess
-import shutil
-import logging
-import time
+
 try:
     from dotenv import load_dotenv
     from decouple import config
@@ -561,8 +555,7 @@ def ensure_env():
 def verify_django_setup():
     """Check Django + middleware integration."""
     try:
-        import django
-        from django.conf import settings
+        
         django.setup()
         middlewares = getattr(settings, "MIDDLEWARE", [])
         has_hyperx = any("hyperx.middleware.HyperXMiddleware" in m for m in middlewares)
@@ -631,8 +624,6 @@ def check_watcher_health(max_retries=3):
 # ─────────────────────────────────────────────
 # 5️⃣  Summary Reporter
 # ─────────────────────────────────────────────
-import platform
-import subprocess
 
 def summarize(openai_key, report_path: Path = None):
     print("\n──────────────────────────────────────────────")
@@ -664,7 +655,7 @@ def summarize(openai_key, report_path: Path = None):
 
     # Framework versions
     try:
-        import django
+        
         summary["django_version"] = django.get_version()
     except Exception:
         pass
