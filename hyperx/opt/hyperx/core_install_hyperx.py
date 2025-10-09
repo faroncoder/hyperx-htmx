@@ -290,10 +290,10 @@ HYPERX_SECURITY = {
                     "flake8", ".", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"
                 ])
 
-            
+
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
         """Add disclosure comment explaining what HyperX installer modified."""
-
+        import shutil, subprocess
 
         # Check if disclosure already exists
         if "HyperX Auto-Installer Disclosure" in content:
@@ -310,7 +310,7 @@ HYPERX_SECURITY = {
             "# The following changes were made:",
         ]
 
-        # Run optional flake8 check once if available
+        # Optional flake8 check
         if shutil.which("flake8"):
             subprocess.run(
                 [
@@ -324,32 +324,18 @@ HYPERX_SECURITY = {
                 check=False,
             )
 
-        # ───── INSTALLED_APPS section ─────
-        if changes_made and changes_made.get("apps_added"):
-            disclosure_lines.extend(
-                [
-                    "#",
-                    "# ✅ INSTALLED_APPS - Added:",
-                ]
-            )
+        if changes_made.get("apps_added"):
+            disclosure_lines.append("#\n# ✅ INSTALLED_APPS - Added:")
             for app in changes_made["apps_added"]:
-                clean_app = app.strip('"')
-                disclosure_lines.append(f"#    • {clean_app}")
+                disclosure_lines.append(f"#    • {app.strip('\"')}")
 
-        # ───── MIDDLEWARE section ─────
-        if changes_made and changes_made.get("middleware_added"):
-            disclosure_lines.extend(
-                [
-                    "#",
-                    "# ✅ MIDDLEWARE - Added:",
-                ]
-            )
+        if changes_made.get("middleware_added"):
+            disclosure_lines.append("#\n# ✅ MIDDLEWARE - Added:")
             for mw in changes_made["middleware_added"]:
                 mw_name = mw.strip('"').split(".")[-1]
                 disclosure_lines.append(f"#    • {mw_name}")
 
-        # ───── CONFIG section ─────
-        if changes_made and changes_made.get("config_added"):
+        if changes_made.get("config_added"):
             disclosure_lines.extend(
                 [
                     "#",
@@ -359,16 +345,13 @@ HYPERX_SECURITY = {
                 ]
             )
 
-        # ───── Footer ─────
         disclosure_lines.extend(
             [
                 "#",
                 "# 🧹 CLEANUP:",
                 "#    • Management commands will be auto-removed after installation",
-                "#    • Prevents cluttering your Django project directory",
                 "#",
                 "# 📚 Documentation: https://github.com/faroncoder/hyperx-htmx",
-                "# 🔧 To remove HyperX: Delete the added sections above",
                 f"# 💾 Original backup saved as: {self.backup_path.name}",
                 "# " + "=" * 70,
             ]
@@ -376,54 +359,54 @@ HYPERX_SECURITY = {
 
         if not content.endswith("\n"):
             content += "\n"
-
         content += "\n".join(disclosure_lines) + "\n"
         return content
 
-    def install(self, create_backup: bool = True) -> bool:
-        """Main installation method."""
-        if not self.settings_path.exists():
-            print(f"❌ Settings file not found: {self.settings_path}")
-            return False
+
+        def install(self, create_backup: bool = True) -> bool:
+            """Main installation method."""
+            if not self.settings_path.exists():
+                print(f"❌ Settings file not found: {self.settings_path}")
+                return False
+                
+            print(f"🚀 Installing HyperX into {self.settings_path}")
             
-        print(f"🚀 Installing HyperX into {self.settings_path}")
-        
-        # Create backup
-        if create_backup and not self.backup_settings():
-            return False
+            # Create backup
+            if create_backup and not self.backup_settings():
+                return False
+                
+            # Read current settings
+            content = self.read_settings()
+            if not content:
+                return False
+                
+            # Apply modifications and track changes
+            changes_made = {}
             
-        # Read current settings
-        content = self.read_settings()
-        if not content:
-            return False
+            content, apps_added = self.add_to_installed_apps(content)
+            changes_made['apps_added'] = apps_added
             
-        # Apply modifications and track changes
-        changes_made = {}
-        
-        content, apps_added = self.add_to_installed_apps(content)
-        changes_made['apps_added'] = apps_added
-        
-        content, middleware_added = self.add_to_middleware(content)
-        changes_made['middleware_added'] = middleware_added
-        
-        content, config_added = self.add_hyperx_config(content)
-        changes_made['config_added'] = config_added
-        
-        # Add disclosure if any changes were made
-        if any([apps_added, middleware_added, config_added]):
-            content = self.add_hyperx_disclosure(content, changes_made)
-        
-        # Write modified settings
-        if not self.write_settings(content):
-            return False
+            content, middleware_added = self.add_to_middleware(content)
+            changes_made['middleware_added'] = middleware_added
             
-        print("🎉 HyperX installation completed successfully!")
-        print("\n📋 Next steps:")
-        print("1. Run: python manage.py migrate")
-        print("2. In your templates: {% load hyperx %}")
-        print("3. Check the documentation for usage examples")
-        
-        return True
+            content, config_added = self.add_hyperx_config(content)
+            changes_made['config_added'] = config_added
+            
+            # Add disclosure if any changes were made
+            if any([apps_added, middleware_added, config_added]):
+                content = self.add_hyperx_disclosure(content, changes_made)
+            
+            # Write modified settings
+            if not self.write_settings(content):
+                return False
+                
+            print("🎉 HyperX installation completed successfully!")
+            print("\n📋 Next steps:")
+            print("1. Run: python manage.py migrate")
+            print("2. In your templates: {% load hyperx %}")
+            print("3. Check the documentation for usage examples")
+            
+            return True
 
 
 
