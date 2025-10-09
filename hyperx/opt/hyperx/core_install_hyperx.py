@@ -3,7 +3,7 @@
 🚀 HyperX Auto-Installer for Django Projects
 =============================================
 """
-
+from datetime import datetime
 import os
 import sys
 import re
