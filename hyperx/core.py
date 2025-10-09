@@ -912,7 +912,7 @@ def xtab_required(expected_tab=None, expected_function=None):
 # # Complete HTMX Attributes Reference Guide
 
 # ## Overview
-# This document provides a comprehensive reference for all HTMX attributes available for use in HTMX applications. HTMX attributes control how elements interact with servers, handle events, and manage content updates.
+# This document provides a comprehensive reference for all HTMX attributes available for use in HTMX applications. HTMX attributes control how hyperx-elements interact with servers, handle events, and manage content updates.
 
 # ## Core HTTP Method Attributes
 
@@ -996,7 +996,7 @@ def xtab_required(expected_tab=None, expected_function=None):
 # hx-trigger="click throttle:1s"      <!-- Throttle to max once per second -->
 # hx-trigger="keyup changed delay:500ms" <!-- Combined modifiers -->
 # hx-trigger="click from:body"        <!-- Listen on body element -->
-# hx-trigger="click target:.button"   <!-- Only from .button elements -->
+# hx-trigger="click target:.button"   <!-- Only from .button hyperx-elements -->
 # hx-trigger="click consume"          <!-- Consume the event -->
 # 
 
@@ -1039,7 +1039,7 @@ def xtab_required(expected_tab=None, expected_function=None):
 # ### Include Other Elements
 # 
 # hx-include="#other-form"            <!-- Include another form's data -->
-# hx-include=".form-group"            <!-- Include elements by class -->
+# hx-include=".form-group"            <!-- Include hyperx-elements by class -->
 # hx-include="[data-include]"         <!-- Include by attribute -->
 # 
 
@@ -1340,7 +1340,7 @@ def xtab_required(expected_tab=None, expected_function=None):
 # 4. **Debounce user input** with `delay:` modifier
 # 5. **Use `hx-select`** to transfer only needed HTML
 # 6. **Implement proper error handling** for better UX
-# 7. **Use `hx-preserve`** for expensive-to-recreate elements
+# 7. **Use `hx-preserve`** for expensive-to-recreate hyperx-elements
 
 # ## Debugging Attributes
 

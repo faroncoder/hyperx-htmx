@@ -163,7 +163,7 @@ default_app_config = "hyperx.apps.HyperXConfig"
 # ─────────────────────────────────────────────
 def autodiscover() -> None:
     """
-    Ensures HyperX template tags and declarative elements
+    Ensures HyperX template tags and declarative hyperx-elements
     are loaded and available to Django's template engine.
     Safe to call from AppConfig.ready() or shell imports.
     """

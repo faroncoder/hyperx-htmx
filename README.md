@@ -2,8 +2,7 @@
 From “Coding for Django” → Declaring Django
 
 HyperX 3.1.0 marks a paradigm shift — from writing Django code about behavior to declaring behavior directly inside templates.
-Instead of wiring HTMX by hand, developers now speak declaratively through HyperX Elements — where the server describes interaction, security, and flow as part of its native language.
-
+yp
 🧠 Declarative HyperX Elements
 
 HyperX 2.1 introduced {% hx %} blocks and <hx:*> declarative syntax.
@@ -36,7 +35,7 @@ Self-installing CLI — python manage.py install_hyperx auto-patches settings.py
 
 Improved Security Core — rate-limiting, pattern detection, and TabX validation now declarative in HYPERX_SECURITY.
 
-Refined Compiler AST — faster parse/render for nested elements and inline JSON payloads.
+Refined Compiler AST — faster parse/render for nested hyperx-elements and inline JSON payloads.
 
 🛠️ Installation
 Quick Start
