@@ -263,6 +263,7 @@ HYPERX_SECURITY = {
             for app in changes_made['apps_added']:
                 clean_app = app.strip('"')
                 disclosure_lines.append(f"#    • {clean_app}")
+                flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
 
 
                 
