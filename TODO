@@ -1,0 +1,1 @@
+1. Would you like me to add a watch-build command next — a continuous watcher that monitors models.py and re-triggers hyperx build automatically when the file changes?

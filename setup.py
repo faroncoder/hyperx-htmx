@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hyperx-htmx",
-    version="3.2.6",
+    version="3.2.7",
     author="Jeff Panasuik",
     author_email="jeff.panasuik@gmail.com",
     description="Declarative HTMX + Elementy framework for Django",
@@ -18,6 +18,8 @@ setup(
         "Django>=4.2",
         "beautifulsoup4>=4.12",
         "django-bootstrap5>=23.0",
+        "daphne",
+        
     ],
     python_requires=">=3.10",
     classifiers=[
@@ -33,10 +35,10 @@ setup(
     entry_points={
         # ✅ Modern Django app autodiscovery (no default_app_config needed)
         "console_scripts" :[
-            "hx-find = hyperx.autodiscover:main",
-            "hx-install = install_hyperx:main",
-            "hyperx = hyperx.hx_cli:main",   # ← unified CLI (this replaces hx-cli)
-            "hx = hyperx.hx_cli:main",       # ← optional short alias
+            "hx-find = hyperx.bin.autodiscover:main",
+            "hx-install = bin.install_hyperx:main",
+            "hyperx = hyperx.bin.hx_cli:main",   # ← unified CLI (this replaces hx-cli)
+            "hx = hyperx.bin.hx_cli:main",       # ← optional short alias
     ],
 
     "django.apps": [

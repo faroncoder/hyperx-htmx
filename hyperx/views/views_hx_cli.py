@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from django.views import View
 import subprocess
 from django.core import management
-from ..core.core import *
-from ..hx-cli import *
-from ..autodiscover import *
+from hyperx.core.core import *
+from hyperx.bin.hx-cli import *
+from hxyper.bin.autodiscover import *
 
 def hx_cli_terminal(request):
     subprocess.run(["hx-cli"], check=True)

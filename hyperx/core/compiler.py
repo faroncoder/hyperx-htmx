@@ -12,8 +12,8 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 import json
-from .templatetags.hyperx import convert_import
-from .core import *
+from hyperx.templatetags.hyperx import convert_import
+from hyperx.core.core import *
 
 # ─────────────────────────────────────────────
 # 📦 AST Structures

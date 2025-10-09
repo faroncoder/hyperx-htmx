@@ -1,0 +1,16 @@
+{% extends "base_hx.html" %}
+{% load hyperx %}
+
+{% block title %}Daphne Status{% endblock %}
+{% block content %}
+<h2 class="mb-3">Daphne Status Monitor</h2>
+
+{% hx %}
+  <hx:panel get="daphne_status"
+            target="#status-panel"
+            swap="outerHTML"
+            trigger="every 5s" />
+{% endhx %}
+
+<div id="status-panel"></div>
+{% endblock %}

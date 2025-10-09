@@ -11,7 +11,10 @@ from pathlib import Path
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
-from ...core import *
+from hyperx.core.core import *
+from hyperx.templatetags.hyperx import register_hx_tag
+from django.utils.html import escape
+
 
 
 ROOT_DIR = Path(__file__).resolve().parent.parent

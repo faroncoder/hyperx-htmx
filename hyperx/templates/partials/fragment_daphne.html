@@ -1,0 +1,6 @@
+{% if not daphne_running %}
+<div class="alert alert-danger mt-3" role="alert">
+  🔴 <strong>Daphne server not running!</strong><br>
+  Tried localhost ports 7777–7787 without success.
+</div>
+{% endif %}

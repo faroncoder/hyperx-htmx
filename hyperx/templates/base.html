@@ -1,0 +1,23 @@
+{% load hyperx %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>⚡ HyperX 3.2.6</title>
+  
+  {% bootstrap_css %}        {# works if django-bootstrap5 installed #}
+  {% hx_auto_import_css %}
+  {% hx_runtime_scripts %}   {# loader.js / drawer.js etc. auto-injected in DEBUG #}
+</head>
+<body>
+     <hx:loader id="global-loader" text="Loading..." fullscreen="true" />
+  
+  
+
+  {% bootstrap_javascript %}
+  {% hx_auto_import_js %}
+  
+
+
+</body>
+</html>

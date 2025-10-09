@@ -12,13 +12,13 @@ from django.http import HttpResponseBadRequest
 from django.utils.deprecation import MiddlewareMixin
 from django.middleware.csrf import get_token
 from django.utils.html import escape
-from .core.core import parse_xtab_header, validate_htmx_request
+from hypxer.core.core import parse_xtab_header, validate_htmx_request
 
 
 logger = logging.getLogger("hyperx.middleware")
-logger_middleware = logging.getLogger("core.htmx_implementation.middleware")
-logger_security = logging.getLogger("core.htmx_implementation.security")
-logger_performance = logging.getLogger("core.htmx_implementation.performance")
+logger_middleware = logging.getLogger("hyperx.core.htmx_implementation.middleware")
+logger_security = logging.getLogger("hyperx.core.htmx_implementation.security")
+logger_performance = logging.getLogger("hyperx.core.htmx_implementation.performance")
 
 
 # ================================================================

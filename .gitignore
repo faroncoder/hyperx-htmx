@@ -3,4 +3,12 @@ old/
 */old/*
 _doc/
 */_doc/*
-
+*/__pycache__/*
+__pycache__/
+.github/
+tests/
+LICENSE
+README.md
+CHANGELOG.md
+.eslintrc
+__init__.py

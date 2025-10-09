@@ -13,7 +13,7 @@ import logging
 import time
 from django.conf import settings
 from typing import Tuple, Optional, List
-from ...core.core import *
+from hyperx.core.core import *
 
 ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 

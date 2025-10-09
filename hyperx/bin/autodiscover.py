@@ -1,5 +1,5 @@
 import importlib, pkgutil, logging
-from .core.core import *
+from hyperx.core.core import *
 
 _logger = logging.getLogger("hyperx")
 
