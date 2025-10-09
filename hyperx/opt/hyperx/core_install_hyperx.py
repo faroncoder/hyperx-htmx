@@ -279,18 +279,18 @@ HYPERX_SECURITY = {
         
        
 
-        if changes_made.get('apps_added'):
-            disclosure_lines.extend([
-                "#",
-                "# ✅ INSTALLED_APPS - Added:",
-            ])
+            if changes_made.get('apps_added'):
+                disclosure_lines.extend([
+                    "#",
+                    "# ✅ INSTALLED_APPS - Added:",
+                ])
 
-            for app in (changes_made.get('apps_added') or []):
-                clean_app = app.strip('"')
-                disclosure_lines.append(f"#    • {clean_app}")
-                
-                # To run flake8 as a shell command from Python, use subprocess:
-
+                for app in (changes_made.get('apps_added') or []):
+                    clean_app = app.strip('"')
+                    disclosure_lines.append(f"#    • {clean_app}")
+                    
+                    # To run flake8 as a shell command from Python, use subprocess:
+            if changes_made.get('middleware_added'):
 
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
         """Add disclosure comment explaining what HyperX installer modified."""
