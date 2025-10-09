@@ -13,6 +13,9 @@ import sys
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from pathlib import Path
+..opt.hyperx.core_install_hyperx import HyperXInstaller, find_django_settings
+
+
 
 # Import from the core installer location
 try:
