@@ -255,6 +255,8 @@ HYPERX_SECURITY = {
             "# The following changes were made:",
         ]
         
+        import subprocess
+
         if changes_made.get('apps_added'):
             disclosure_lines.extend([
                 "#",
@@ -263,8 +265,10 @@ HYPERX_SECURITY = {
             for app in changes_made['apps_added']:
                 clean_app = app.strip('"')
                 disclosure_lines.append(f"#    • {clean_app}")
-                flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-
+                # To run flake8 as a shell command from Python, use subprocess:
+                subprocess.run([
+                    "flake8", ".", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"
+                ])
 
                 
         if changes_made.get('middleware_added'):
