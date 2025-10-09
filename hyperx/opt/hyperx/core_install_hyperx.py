@@ -285,10 +285,8 @@ HYPERX_SECURITY = {
             for app in changes_made['apps_added']:
                 clean_app = app.strip('"')
                 disclosure_lines.append(f"#    • {clean_app}")
+                
                 # To run flake8 as a shell command from Python, use subprocess:
-                subprocess.run([
-                    "flake8", ".", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"
-                ])
 
 
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
