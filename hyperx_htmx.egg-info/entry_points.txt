@@ -1,2 +1,0 @@
-[django.apps]
-hyperx = hyperx.apps.HyperXConfig
