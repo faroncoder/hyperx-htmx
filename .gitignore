@@ -1,0 +1,6 @@
+.env
+old/
+*/old/*
+_doc/
+*/_doc/*
+

@@ -1,4 +1,12 @@
 recursive-include hyperx/static *
 recursive-include hyperx/templates *
 recursive-include hyperx/templatetags *
+
+recursive-include hyperx/opt/hyperx/*
+recursive-include hyperx/management/commands/*
+recursive-include hyperx/hyperx_elements/*
+recursive-include hyperx/views/*
+recursive-include hyperx/urls/*
+
+
 include README.md LICENSE

@@ -11,7 +11,8 @@ import os
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pathlib import Path
-from ..opt.hyperx.core_install_hyperx import *
+from ...opt.hyperx.core_install_hyperx import *
+from ...core.core import *
 
 class Command(BaseCommand):
     help = 'Check HyperX configuration and installation status'

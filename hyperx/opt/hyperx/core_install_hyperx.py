@@ -13,7 +13,9 @@ import logging
 import time
 from django.conf import settings
 from typing import Tuple, Optional, List
+from ...core.core import *
 
+ROOT_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class HyperXInstaller:
@@ -180,6 +182,11 @@ HYPERX_SECURITY = {
             
         print(f"✅ Added {len(missing_apps)} apps to INSTALLED_APPS")
         return '\n'.join(lines), missing_apps
+
+
+    
+
+
         
     def add_to_middleware(self, content: str) -> Tuple[str, List[str]]:
         """Add HyperX middleware to MIDDLEWARE in the correct position."""
@@ -238,58 +245,58 @@ HYPERX_SECURITY = {
 
 
         
-    # def add_hyperx_config(self, content: str) -> Tuple[str, bool]:
-    #     """Add HyperX configuration at the end of the file."""
-    #     if 'HYPERX_MIDDLEWARE' in content:
-    #         print("✅ HyperX configuration already present")
-    #         return content, False
+    def add_hyperx_config(self, content: str) -> Tuple[str, bool]:
+        """Add HyperX configuration at the end of the file."""
+        if 'HYPERX_MIDDLEWARE' in content:
+            print("✅ HyperX configuration already present")
+            return content, False
             
-    #     # Add configuration at the end
-    #     if not content.endswith('\n'):
-    #         content += '\n'
+        # Add configuration at the end
+        if not content.endswith('\n'):
+            content += '\n'
             
-    #     content += self.HYPERX_CONFIG
-    #     print("✅ Added HyperX configuration")
-    #     return content, True
+        content += self.HYPERX_CONFIG
+        print("✅ Added HyperX configuration")
+        return content, True
         
         
-    #     if shutil.which("flake8"):
-    #         subprocess.run(
-    #             ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
-    #             "--show-source", "--statistics"],
-    #             check=False,
-    #         )
-    #     else:
-    #         print("⚠️  flake8 not found, skipping syntax check")
+        if shutil.which("flake8"):
+            subprocess.run(
+                ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
+                "--show-source", "--statistics"],
+                check=False,
+            )
+        else:
+            print("⚠️  flake8 not found, skipping syntax check")
 
-    #     # Check if disclosure already exists
-    #     if 'HyperX Auto-Installer Disclosure' in content:
-    #         return content
+        # Check if disclosure already exists
+        if 'HyperX Auto-Installer Disclosure' in content:
+            return content
             
-    #     # Create disclosure based on what was actually changed
-    #     disclosure_lines = [
-    #         "",
-    #         "# " + "="*70,
-    #         "# HyperX Auto-Installer Disclosure",
-    #         "# " + "="*70,
-    #         f"# This file was automatically modified by HyperX installer on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-    #         "#",
-    #         "# The following changes were made:",
-    #     ]
+        # Create disclosure based on what was actually changed
+        disclosure_lines = [
+            "",
+            "# " + "="*70,
+            "# HyperX Auto-Installer Disclosure",
+            "# " + "="*70,
+            f"# This file was automatically modified by HyperX installer on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "#",
+            "# The following changes were made:",
+        ]
         
        
 
-    #     if changes_made.get('apps_added'):
-    #         disclosure_lines.extend([
-    #             "#",
-    #             "# ✅ INSTALLED_APPS - Added:",
-    #         ])
+        if changes_made.get('apps_added'):
+            disclosure_lines.extend([
+                "#",
+                "# ✅ INSTALLED_APPS - Added:",
+            ])
 
-    #         for app in (changes_made.get('apps_added') or []):
-    #             clean_app = app.strip('"')
-    #             disclosure_lines.append(f"#    • {clean_app}")
+            for app in (changes_made.get('apps_added') or []):
+                clean_app = app.strip('"')
+                disclosure_lines.append(f"#    • {clean_app}")
                 
-    #             # To run flake8 as a shell command from Python, use subprocess:
+                # To run flake8 as a shell command from Python, use subprocess:
         
 
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
@@ -337,6 +344,9 @@ HYPERX_SECURITY = {
                 mw_name = mw.strip('"').split(".")[-1]
                 disclosure_lines.append(f"#    • {mw_name}")
 
+
+
+
         if changes_made.get("config_added"):
             disclosure_lines.extend(
                 [
@@ -365,7 +375,7 @@ HYPERX_SECURITY = {
         return content
 
 
-        def install(self, create_backup: bool = True) -> bool:
+    def install(self, create_backup: bool = True) -> bool:
             """Main installation method."""
             if not self.settings_path.exists():
                 print(f"❌ Settings file not found: {self.settings_path}")
@@ -450,156 +460,170 @@ def find_django_settings() -> Optional[str]:
     return None
 
 
-def install_hyperx(settings_path: Optional[str] = None) -> bool:
-    """Main installation function."""
-    if not settings_path:
-        settings_path = find_django_settings()
-        
-    if not settings_path:
-        print("❌ Could not find Django settings.py file")
-        print("💡 Please specify the path: install_hyperx('/path/to/settings.py')")
-        return False
-        
-    installer = HyperXInstaller(settings_path)
-    return installer.install()
+    def install_hyperx(settings_path: Optional[str] = None) -> bool:
+        """Main installation function."""
+        if not settings_path:
+            settings_path = find_django_settings()
+            
+        if not settings_path:
+            print("❌ Could not find Django settings.py file")
+            print("💡 Please specify the path: install_hyperx('/path/to/settings.py')")
+            return False
+            
+        installer = HyperXInstaller(settings_path)
+        return installer.install()
 
 
+        """
+    ──────────────────────────────────────────────
+    Core Installer for HyperX Environment
+    ──────────────────────────────────────────────
+    Handles:
+    - Initial environment setup
+    - Auto .env creation
+    - HyperX middleware + service provisioning
+    - Dataset watcher activation
+    ──────────────────────────────────────────────
     """
-──────────────────────────────────────────────
-Core Installer for HyperX Environment
-──────────────────────────────────────────────
-Handles:
-  - Initial environment setup
-  - Auto .env creation
-  - HyperX middleware + service provisioning
-  - Dataset watcher activation
-──────────────────────────────────────────────
-"""
-# Additional imports for system-level installation
+    # Additional imports for system-level installation
 
-try:
-    from dotenv import load_dotenv
-    from decouple import config
-except ImportError:
-    print("⚠️ Optional dependencies not installed: python-dotenv python-decouple")
-    load_dotenv = lambda x: None
-    config = lambda x, default=None: default
-
-BASE_DIR = Path("/opt/hyperx")
-LOG_FILE = Path("/var/log/hyperx_core_install.log")
-SERVICE_NAME = "hyperx-dataset-watch.service"
-SERVICE_PATH = Path(f"/etc/systemd/system/{SERVICE_NAME}")
-WATCHER_SCRIPT = BASE_DIR / "hyperx_dataset_watch_service.py"
-HYPERX_ENV = BASE_DIR / ".env"
-HYPERX_ENV_EXAMPLE = BASE_DIR / ".env.example"
-
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
-                    format="%(asctime)s - %(levelname)s - %(message)s")
-log = logging.getLogger("hyperx_core_install")
-
-
-def run(cmd, check=True, timeout=15):
-    """Execute a shell command safely."""
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
-        if check and result.returncode != 0:
-            log.error(f"❌ Command failed: {cmd}\n{result.stderr}")
-            raise RuntimeError(result.stderr)
-        return result.stdout.strip()
-    except subprocess.TimeoutExpired:
-        log.warning(f"⏳ Command timed out: {cmd}")
-        return ""
+        from dotenv import load_dotenv
+        from decouple import config
+    except ImportError:
+        print("⚠️ Optional dependencies not installed: python-dotenv python-decouple")
+        load_dotenv = lambda x: None
+        config = lambda x, default=None: default
 
-# ─────────────────────────────────────────────
-# 1️⃣  Environment Setup
-# ─────────────────────────────────────────────
-def ensure_env():
-    """Ensure that .env exists or copy from .env.example."""
-    if not HYPERX_ENV.exists():
-        if HYPERX_ENV_EXAMPLE.exists():
-            shutil.copy(HYPERX_ENV_EXAMPLE, HYPERX_ENV)
-            log.info("✅ Copied .env.example → .env")
-        else:
-            HYPERX_ENV.write_text("OPENAI_API_KEY=your-openai-api-key-here\n")
-            log.warning("⚠️ Created fallback .env file.")
-    load_dotenv(HYPERX_ENV)
-    return config("OPENAI_API_KEY", default="")
 
-# ─────────────────────────────────────────────
-# 2️⃣  Django Setup Validation
-# ─────────────────────────────────────────────
-def verify_django_setup():
-    """Check Django + middleware integration."""
-    try:
-        
-        django.setup()
-        middlewares = getattr(settings, "MIDDLEWARE", [])
-        has_hyperx = any("hyperx.middleware.HyperXMiddleware" in m for m in middlewares)
-        if has_hyperx:
-            log.info("✅ HyperXMiddleware detected in Django settings.")
-        else:
-            log.warning("⚠️ HyperXMiddleware not found in Django settings.")
-        return True
-    except Exception as e:
-        log.error(f"❌ Django setup check failed: {e}")
-        return False
 
-# ─────────────────────────────────────────────
-# 3️⃣  Dataset Watcher Installation
-# ─────────────────────────────────────────────
-def install_dataset_watcher():
-    """Run the dataset watcher installer."""
-    if not WATCHER_SCRIPT.exists():
-        log.warning("⚠️ Dataset watcher script missing; skipping setup.")
-        return False
-    try:
-        log.info("🚀 Installing Dataset Watcher service...")
-        run(f"sudo python3 {WATCHER_SCRIPT}")
-        log.info("✅ Dataset Watcher installed successfully.")
-        return True
-    except Exception as e:
-        log.error(f"❌ Watcher installation failed: {e}")
-        return False
 
-# ─────────────────────────────────────────────
-# 4️⃣  Watcher Health & Auto-Restart
-# ─────────────────────────────────────────────
-def check_watcher_health(max_retries=3):
-    """Check if watcher is active; restart if not."""
-    for attempt in range(max_retries):
-        status = run(f"systemctl is-active {SERVICE_NAME}", check=False)
-        if status == "active":
-            print("\n🟢 Watcher Status: ACTIVE ✅")
-            log.info("✅ Watcher service is active.")
-            print("──────────────────────────────────────────────")
-            print("📜 Recent Logs:")
-            print("──────────────────────────────────────────────")
-            logs = run(f"journalctl -u {SERVICE_NAME} -n 20 --no-pager", check=False)
-            print(logs if logs.strip() else "(No recent logs yet)")
-            print("──────────────────────────────────────────────")
+
+    BASE_DIR = Path("/hyperx/opt/hyperx")
+    LOG_FILE = Path("/var/log/hyperx_core_install.log")
+    SERVICE_NAME = "hyperx-dataset-watch.service"
+    SERVICE_PATH = Path(f"/etc/systemd/system/{SERVICE_NAME}")
+    WATCHER_SCRIPT = BASE_DIR / "hyperx_dataset_watch_service.py"
+    HYPERX_ENV = BASE_DIR / ".env.example"
+    HYPERX_ENV_EXAMPLE = Path("./.env.example")
+
+    logging.basicConfig(filename=LOG_FILE, level=logging.INFO,
+                        format="%(asctime)s - %(levelname)s - %(message)s")
+    log = logging.getLogger("hyperx_core_install")
+
+
+    def run(cmd, check=True, timeout=15):
+        """Execute a shell command safely."""
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+            if check and result.returncode != 0:
+                log.error(f"❌ Command failed: {cmd}\n{result.stderr}")
+                raise RuntimeError(result.stderr)
+            return result.stdout.strip()
+        except subprocess.TimeoutExpired:
+            log.warning(f"⏳ Command timed out: {cmd}")
+            return ""
+
+    # ─────────────────────────────────────────────
+    # 1️⃣  Environment Setup
+    # ─────────────────────────────────────────────
+    def ensure_env(filename: Path = HYPERX_ENV) -> str:
+        """Ensure that .env exists or copy from .env.example."""
+        if not filename.exists():
+            if HYPERX_ENV_EXAMPLE.exists():
+                shutil.copy(HYPERX_ENV_EXAMPLE, filename)
+                log.info("✅ Copied .env.example → .env")
+            else:
+                filename.write_text("OPENAI_API_KEY=your-openai-api-key-here\n")
+                log.warning("⚠️ Created fallback .env file.")
+        load_dotenv(filename)
+        return config("OPENAI_API_KEY", default="")
+
+        # ─────────────────────────────────────────────
+    # 2️⃣  Django Setup Validation
+    # ─────────────────────────────────────────────
+    def verify_django_setup():
+        """Check Django + middleware integration."""
+        try:
+            
+            django.setup()
+            middlewares = getattr(settings, "MIDDLEWARE", [])
+            has_hyperx = any("hyperx.middleware.HyperXMiddleware" in m for m in middlewares)
+            if has_hyperx:
+                log.info("✅ HyperXMiddleware detected in Django settings.")
+            else:
+                log.warning("⚠️ HyperXMiddleware not found in Django settings.")
             return True
+        except Exception as e:
+            log.error(f"❌ Django setup check failed: {e}")
+            return False
 
-        # attempt restart if not active
-        print(f"\n🔄 Attempt {attempt+1}: restarting watcher ({status}) ...")
-        run(f"systemctl restart {SERVICE_NAME}", check=False)
-        delay = min(5 * (2 ** attempt), 60)
-        print(f"⏳ Waiting {delay}s for recovery...")
-        time.sleep(delay)
 
-    # after all retries
-    final_status = run(f"systemctl is-active {SERVICE_NAME}", check=False)
-    if final_status == "active":
-        print("\n🟢 Watcher recovered after restart ✅")
-        log.info("✅ Watcher recovered after restart.")
-        return True
-    else:
-        print("\n🔴 Watcher failed to start after retries ❌")
-        log.error("❌ Watcher did not recover after retries.")
-        return False
+        target_dir = Path("../hyperx_elements")
 
-# ─────────────────────────────────────────────
-# 5️⃣  Summary Reporter
-# ─────────────────────────────────────────────
+        if target_dir.exists():
+            print(f"⚠️  {target_dir} already exists — skipping git clone.")
+        else:
+            subprocess.run(
+                ["git", "clone", "https://github.com/faroncoder/hyperx-elements.git", str(target_dir)],
+                check=True,
+            )
+
+
+    # ─────────────────────────────────────────────
+    # 3️⃣  Dataset Watcher Installation
+    # ─────────────────────────────────────────────
+    def install_dataset_watcher():
+        """Run the dataset watcher installer."""
+        if not WATCHER_SCRIPT.exists():
+            log.warning("⚠️ Dataset watcher script missing; skipping setup.")
+            return False
+        try:
+            log.info("🚀 Installing Dataset Watcher service...")
+            run(f"sudo python3 {WATCHER_SCRIPT}")
+            log.info("✅ Dataset Watcher installed successfully.")
+            return True
+        except Exception as e:
+            log.error(f"❌ Watcher installation failed: {e}")
+            return False
+
+        # ─────────────────────────────────────────────
+        # 4️⃣  Watcher Health & Auto-Restart
+        # ─────────────────────────────────────────────
+        def check_watcher_health(max_retries=3):
+            """Check if watcher is active; restart if not."""
+            for attempt in range(max_retries):
+                status = run(f"systemctl is-active {SERVICE_NAME}", check=False)
+                if status == "active":
+                    print("\n🟢 Watcher Status: ACTIVE ✅")
+                    log.info("✅ Watcher service is active.")
+                    print("──────────────────────────────────────────────")
+                    print("📜 Recent Logs:")
+                    print("──────────────────────────────────────────────")
+                    logs = run(f"journalctl -u {SERVICE_NAME} -n 20 --no-pager", check=False)
+                    print(logs if logs.strip() else "(No recent logs yet)")
+                    print("──────────────────────────────────────────────")
+                    return True
+
+                # attempt restart if not active
+                print(f"\n🔄 Attempt {attempt+1}: restarting watcher ({status}) ...")
+                run(f"systemctl restart {SERVICE_NAME}", check=False)
+                delay = min(5 * (2 ** attempt), 60)
+                print(f"⏳ Waiting {delay}s for recovery...")
+                time.sleep(delay)
+
+            # after all retries
+            final_status = run(f"systemctl is-active {SERVICE_NAME}", check=False)
+            if final_status == "active":
+                print("\n🟢 Watcher recovered after restart ✅")
+                log.info("✅ Watcher recovered after restart.")
+                return True
+            else:
+                print("\n🔴 Watcher failed to start after retries ❌")
+                log.error("❌ Watcher did not recover after retries.")
+                return False
+
+
 
 def summarize(openai_key, report_path: Path = None):
     print("\n──────────────────────────────────────────────")
@@ -684,41 +708,41 @@ def summarize(openai_key, report_path: Path = None):
     log.info("✅ Installation and audit summary displayed.")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Install HyperX into Django or system environment.")
-    parser.add_argument("settings_path", nargs="?", help="Path to settings.py")
-    parser.add_argument("--no-backup", action="store_true", help="Skip backup creation")
-    parser.add_argument("--system-install", action="store_true", help="Install watcher & environment (root only)")
-    parser.add_argument("--report", nargs="?", const="/var/log/hyperx_audit.json",
-                        help="Export JSON audit summary (default: /var/log/hyperx_audit.json)")
-    args = parser.parse_args()
+    def main():
+        parser = argparse.ArgumentParser(description="Install HyperX into Django or system environment.")
+        parser.add_argument("settings_path", nargs="?", help="Path to settings.py")
+        parser.add_argument("--no-backup", action="store_true", help="Skip backup creation")
+        parser.add_argument("--system-install", action="store_true", help="Install watcher & environment (root only)")
+        parser.add_argument("--report", nargs="?", const="/var/log/hyperx_audit.json",
+                            help="Export JSON audit summary (default: /var/log/hyperx_audit.json)")
+        args = parser.parse_args()
 
-    # ── System-level install ───────────────────
-    if args.system_install:
-        if os.geteuid() != 0:
-            print("❌ Please run with sudo for system installation.")
+        # ── System-level install ───────────────────
+        if args.system_install:
+            if os.geteuid() != 0:
+                print("❌ Please run with sudo for system installation.")
+                sys.exit(1)
+            key = ensure_env()
+            install_dataset_watcher()
+            summarize(key, report_path=args.report)
+            print("✅ System-level setup complete.")
+            return
+
+        # ── Django integration ─────────────────────
+        settings_path = args.settings_path or find_django_settings()
+        if not settings_path:
+            print("❌ Could not locate settings.py")
             sys.exit(1)
-        key = ensure_env()
-        install_dataset_watcher()
-        summarize(key, report_path=args.report)
-        print("✅ System-level setup complete.")
-        return
 
-    # ── Django integration ─────────────────────
-    settings_path = args.settings_path or find_django_settings()
-    if not settings_path:
-        print("❌ Could not locate settings.py")
-        sys.exit(1)
-
-    installer = HyperXInstaller(settings_path)
-    ok = installer.install(create_backup=not args.no_backup)
-    if ok:
-        summarize(ensure_env(), report_path=args.report)
-        print("\n🎯 Django integration complete.")
-    else:
-        print("❌ Installation failed.")
+        installer = HyperXInstaller(settings_path)
+        ok = installer.install(create_backup=not args.no_backup)
+        if ok:
+            summarize(ensure_env(), report_path=args.report)
+            print("\n🎯 Django integration complete.")
+        else:
+            print("❌ Installation failed.")
 
 
 
-if __name__ == "__main__":
-    main()
+    if __name__ == "__main__":
+        main()

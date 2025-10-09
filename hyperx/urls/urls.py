@@ -6,4 +6,6 @@ app_name = "hyperx"
 
 urlpatterns = [
     path("upload/", upload_handler, name="upload_handler"),
+    path("install/", hyperx_install, name="hyperx_install"),  # from core_install_hyperx.py
+    
 ]

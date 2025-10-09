@@ -13,8 +13,8 @@ from django.template.library import import_library
 from django.templatetags.static import static as static_func
 from django.template.loader import render_to_string
 from bs4 import BeautifulSoup
-from hyperx.compiler import HyperXCompiler
-from hyperx.core import build_htmx_attrs
+from ..core.compiler import HyperXCompiler
+from ..core.core import build_htmx_attrs
 
 _logger = logging.getLogger("hyperx")
 register = template.Library()

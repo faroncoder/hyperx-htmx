@@ -1,34 +1,11 @@
-"""
-Django Management Command for HyperX Installation
-=================================================
-
-Usage:
-    python manage.py install_hyperx
-    python manage.py install_hyperx --settings-file /path/to/settings.py
-    python manage.py install_hyperx --no-backup
-"""
 
 import os
 import sys
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from pathlib import Path
-..opt.hyperx.core_install_hyperx import HyperXInstaller, find_django_settings
+..opt.hyperx.core_install_hyperx import *
 
-
-
-# Import from the core installer location
-try:
-    # Try importing from /opt/hyperx first (production location)
-    sys.path.insert(0, '/hyperx/opt')
-    from ..opt.hyperx.core_install_hyperx import HyperXInstaller, find_django_settings
-except ImportError:
-    # Fallback to development location in hyperx.opt.hyperx
-    try:
-        from ...opt.hyperx.core_install_hyperx import HyperXInstaller, find_django_settings
-    except ImportError:
-        # Final fallback to old location (for backwards compatibility)
-        from ...install_hyperx import HyperXInstaller, find_django_settings
 
 
 class Command(BaseCommand):

@@ -1,4 +1,5 @@
 import importlib, pkgutil, logging
+from .core.core import *
 
 _logger = logging.getLogger("hyperx")
 
@@ -7,7 +8,7 @@ def autodiscover():
     Dynamically import all modules under hyperx/templatetags/
     and hyperx/extensions/ if they exist.
     """
-    base_packages = ["hyperx.templatetags", "hyperx.extensions"]
+    base_packages = ["hyperx.templatetags", "hyperx.hyperx_elements"]
     for base in base_packages:
         try:
             pkg = importlib.import_module(base)

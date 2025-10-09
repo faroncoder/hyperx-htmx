@@ -16,5 +16,5 @@ def hyperx_runtime(request):
         static("hxjs/dragdrop.js"),
         static("hxjs/drawer.js"),
     ]
-    html = "\n".join(f'<script type="module" src="{src}"></script>' for src in scripts)
+    html = "\n".join(f'<script type="module" src='{% script "{src}" %}'></script>' for src in scripts)
     return {"HYPERX_RUNTIME_SCRIPTS": mark_safe(html)}

@@ -1,5 +1,7 @@
 from setuptools import setup, find_packages
 
+
+
 setup(
     name="hyperx-htmx",
     version="3.2.4.1",
@@ -31,14 +33,15 @@ setup(
     entry_points={
         # ✅ Modern Django app autodiscovery (no default_app_config needed)
         "console_scripts" :[
-            "hyperx-autodiscover = hyperx:autodiscover",
-            "hyperx-install = hyperx.management.commands.install_hyperx:Command.run",
-            "hyperx-check = hyperx.management.commands.check_hyperx:Command.run",
-        ],
+            "hx-find = hyperx.autodiscover:main",
+            "hx-install = install_hyperx:main",
+            "hyperx = hyperx.hx_cli:main",   # ← unified CLI (this replaces hx-cli)
+            "hx = hyperx.hx_cli:main",       # ← optional short alias
+    ],
 
-        "django.apps": [
-            "hyperx = hyperx.apps.HyperXConfig",
-        ],
+    "django.apps": [
+        "hyperx = hyperx.apps.HyperXConfig",
+    ],
     },
     project_urls={
         "Documentation": "https://github.com/faroncoder/hyperx-htmx/wiki",

@@ -24,8 +24,8 @@ class HyperXConfig(AppConfig):
 
         try:
             # Perform lazy import to avoid circular load during Django startup
-            from importlib import import_module
-            autodiscover = import_module("hyperx.autodiscover").autodiscover
+            # from importlib import import_module
+            from hyperx.autodiscover import autodiscover
             autodiscover()
             self.logger.info("⚡ HyperX autodiscover() executed successfully.")
         except ModuleNotFoundError:

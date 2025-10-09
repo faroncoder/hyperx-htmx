@@ -11,10 +11,13 @@ from pathlib import Path
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from ...core import *
 
-UPLOAD_DIR = Path("/opt/hyperx/uploads")
-AI_AUTOGEN_SCRIPT = Path("/opt/hyperx/ai_schema_autogen.py")
-WATCHER_LOG = Path("/var/log/hyperx_dataset.log")
+
+ROOT_DIR = Path(__file__).resolve().parent.parent
+UPLOAD_DIR = ROOT_DIR / 'media/uploads'
+AI_AUTOGEN_SCRIPT = ROOT_DIR / 'opt/hyperx/ai_schema_autogen.py'
+WATCHER_LOG = ROOT_DIR / 'var/log/hyperx_dataset.log'
 
 log = logging.getLogger("hyperx.upload")
 

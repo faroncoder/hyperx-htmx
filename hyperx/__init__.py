@@ -21,6 +21,8 @@ import sys
 import importlib
 import logging
 
+from pathlib import Path
+
 __version__ = "3.0.0"
 __author__ = "Faroncoder"
 __email__ = "jeff.panasuik@gmail.com"
@@ -30,7 +32,7 @@ __url__ = "https://github.com/faroncoder/hyperx-htmx"
 # ─────────────────────────────────────────────
 # 🧱 Core Imports
 # ─────────────────────────────────────────────
-from .core import (
+from .core.core import (
     build_htmx_attrs,
     htmx_form_submit,
     htmx_infinite_scroll,
@@ -49,6 +51,7 @@ from .core import (
     parse_xtab_header,
     validate_xtab_request,
     xtab_required,
+ 
 )
 
 # ─────────────────────────────────────────────
@@ -63,7 +66,7 @@ from .middleware import (
 # 🧩 Elements Autoload
 # ─────────────────────────────────────────────
 try:
-    import hyperx.elements  # auto-discovers declarative <hx:*> components
+    import hyperx_elements  # auto-discovers declarative <hx:*> components
     ELEMENTS_REGISTERED = True
 except Exception as e:
     ELEMENTS_REGISTERED = False
@@ -72,18 +75,9 @@ except Exception as e:
 # ─────────────────────────────────────────────
 # 🧠 Auto-Installer Integration
 # ─────────────────────────────────────────────
-try:
-    sys.path.insert(0, "/opt/hyperx")
-    from core_install_hyperx import install_hyperx, HyperXInstaller
-except ImportError:
-    try:
-        from .opt.hyperx.core_install_hyperx import install_hyperx, HyperXInstaller
-    except ImportError:
-        try:
-            from .install_hyperx import install_hyperx, HyperXInstaller
-        except ImportError:
-            install_hyperx = None
-            HyperXInstaller = None
+    
+
+
 
 # ─────────────────────────────────────────────
 # 🧩 Optional AI + Dataset Watcher
@@ -157,22 +151,11 @@ __all__ = [
 
 default_app_config = "hyperx.apps.HyperXConfig"
 
+from .core.core import *
 
-# ─────────────────────────────────────────────
-# 🌐 Django-ready Template Registration Hook
-# ─────────────────────────────────────────────
-def autodiscover() -> None:
-    """
-    Ensures HyperX template tags and declarative hyperx-elements
-    are loaded and available to Django's template engine.
-    Safe to call from AppConfig.ready() or shell imports.
-    """
-    try:
-        import sys
-        if "hyperx.templatetags.hyperx" in sys.modules:
-            importlib.reload(sys.modules["hyperx.templatetags.hyperx"])
-        else:
-            importlib.import_module("hyperx.templatetags.hyperx")
-            _logger.info("[HyperX] Template tags loaded successfully.")
-    except Exception as e:
-        _logger.warning(f"[HyperX] Failed to load template tags: {e}")
+
+from .autodiscover  import autodiscover 
+
+
+
+   

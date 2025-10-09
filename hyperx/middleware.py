@@ -12,7 +12,7 @@ from django.http import HttpResponseBadRequest
 from django.utils.deprecation import MiddlewareMixin
 from django.middleware.csrf import get_token
 from django.utils.html import escape
-from .core import parse_xtab_header, validate_htmx_request
+from .core.core import parse_xtab_header, validate_htmx_request
 
 
 logger = logging.getLogger("hyperx.middleware")

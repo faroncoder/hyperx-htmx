@@ -11,6 +11,7 @@ from django.apps import apps
 from django.db import models, connection
 from django.utils.text import slugify
 from openai import OpenAI
+from ...core.core import *
 
 # ──────────────────────────────────────────────
 # Setup Django environment
