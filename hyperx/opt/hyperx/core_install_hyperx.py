@@ -261,7 +261,10 @@ HYPERX_SECURITY = {
                 "# ✅ INSTALLED_APPS - Added:",
             ])
             for app in changes_made['apps_added']:
-                disclosure_lines.append(f"#    • {app.strip('\"')}")
+                clean = app.strip('"')
+                disclosure_lines.append(f"#    • {clean}")
+
+
                 
         if changes_made.get('middleware_added'):
             disclosure_lines.extend([
