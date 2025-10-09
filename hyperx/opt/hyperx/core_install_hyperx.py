@@ -337,7 +337,7 @@ HYPERX_SECURITY = {
                 )
 
             # ───── INSTALLED_APPS section ─────
-            if changes_made.get("apps_added"):
+            if changes_made and changes_made.get("apps_added"):
                 disclosure_lines.extend(
                     [
                         "#",
@@ -349,7 +349,7 @@ HYPERX_SECURITY = {
                     disclosure_lines.append(f"#    • {clean_app}")
 
             # ───── MIDDLEWARE section ─────
-            if changes_made.get("middleware_added"):
+            if changes_made and changes_made.get("middleware_added"):
                 disclosure_lines.extend(
                     [
                         "#",
@@ -361,7 +361,7 @@ HYPERX_SECURITY = {
                     disclosure_lines.append(f"#    • {mw_name}")
 
             # ───── CONFIG section ─────
-            if changes_made.get("config_added"):
+            if changes_made and changes_made.get("config_added"):
                 disclosure_lines.extend(
                     [
                         "#",
