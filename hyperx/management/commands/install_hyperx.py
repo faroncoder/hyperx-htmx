@@ -17,8 +17,8 @@ from pathlib import Path
 # Import from the core installer location
 try:
     # Try importing from /opt/hyperx first (production location)
-    sys.path.insert(0, '/opt/hyperx')
-    from core_install_hyperx import HyperXInstaller, find_django_settings
+    sys.path.insert(0, '/hyperx/opt')
+    from ..opt.hyperx.core_install_hyperx import HyperXInstaller, find_django_settings
 except ImportError:
     # Fallback to development location in hyperx.opt.hyperx
     try:

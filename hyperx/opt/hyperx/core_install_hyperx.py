@@ -12,6 +12,9 @@ import argparse
 from pathlib import Path
 from typing import List, Tuple, Optional, Union
 import json
+from datetime import datetime
+from django.conf import settings
+
 
 
 class HyperXInstaller:
@@ -20,7 +23,7 @@ class HyperXInstaller:
     REQUIRED_APPS = [
         '"django_htmx"',
         '"hyperx"',
-    ]
+    ] 
     
     REQUIRED_MIDDLEWARE = [
         '"django_htmx.middleware.HtmxMiddleware"',
@@ -60,7 +63,16 @@ HYPERX_SECURITY = {
         try:
             content = self.settings_path.read_text()
             self.backup_path.write_text(content)
-            print(f"✅ Backup created: {self.backup_path}")
+            print(f"✅ Backup created: {self.backup_path}")import shutil, subprocess
+if shutil.which("flake8"):
+    subprocess.run(
+        ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
+         "--show-source", "--statistics"],
+        check=False,
+    )
+else:
+    print("⚠️  flake8 not found, skipping syntax check")
+
             return True
         except Exception as e:
             print(f"❌ Failed to create backup: {e}")
@@ -237,10 +249,16 @@ HYPERX_SECURITY = {
         print("✅ Added HyperX configuration")
         return content, True
         
-    def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
-        """Add disclosure comment explaining what HyperX installer modified."""
-        from datetime import datetime
-        
+        import shutil, subprocess
+        if shutil.which("flake8"):
+            subprocess.run(
+                ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
+                "--show-source", "--statistics"],
+                check=False,
+            )
+        else:
+            print("⚠️  flake8 not found, skipping syntax check")
+
         # Check if disclosure already exists
         if 'HyperX Auto-Installer Disclosure' in content:
             return content
