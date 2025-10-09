@@ -291,16 +291,6 @@ HYPERX_SECURITY = {
                 ])
 
                 
-        if changes_made.get('middleware_added'):
-                disclosure_lines.extend([
-                    "#",
-                    "# ✅ MIDDLEWARE - Added:",
-                ])
-                for mw in changes_made['middleware_added']:
-                    mw_name = mw.strip('"').split('.')[-1]  # Get class name only
-                    disclosure_lines.append(f"#    • {mw_name}")
-                    
-                    
         def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
             """Add disclosure comment explaining what HyperX installer modified."""
 
