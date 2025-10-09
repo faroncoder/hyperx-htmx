@@ -1,3 +1,41 @@
+Metadata-Version: 2.4
+Name: hyperx-htmx
+Version: 3.1.0
+Summary: Declarative HTMX + Elementy framework for Django
+Home-page: https://github.com/faroncoder/hyperx-htmx
+Author: Jeff Panasuik
+Author-email: jeff.panasuik@gmail.com
+License: MIT
+Project-URL: Documentation, https://github.com/faroncoder/hyperx-htmx/wiki
+Project-URL: Source, https://github.com/faroncoder/hyperx-htmx
+Project-URL: Tracker, https://github.com/faroncoder/hyperx-htmx/issues
+Classifier: Framework :: Django
+Classifier: Framework :: Django :: 4.2
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: Django>=4.2
+Requires-Dist: beautifulsoup4>=4.12
+Requires-Dist: django-bootstrap5>=23.0
+Dynamic: author
+Dynamic: author-email
+Dynamic: classifier
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: license
+Dynamic: license-file
+Dynamic: project-url
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
+
 Declarative HyperX Elements
 ---
 → HyperX 2.1 introduces `{% hx %}` blocks and `<hx:*>` declarative syntax that 
