@@ -290,95 +290,95 @@ HYPERX_SECURITY = {
                     "flake8", ".", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"
                 ])
 
-                
-        def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
-            """Add disclosure comment explaining what HyperX installer modified."""
+            
+    def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
+        """Add disclosure comment explaining what HyperX installer modified."""
 
 
-            # Check if disclosure already exists
-            if "HyperX Auto-Installer Disclosure" in content:
-                return content
+        # Check if disclosure already exists
+        if "HyperX Auto-Installer Disclosure" in content:
+            return content
 
-            disclosure_lines = [
-                "",
-                "# " + "=" * 70,
-                "# HyperX Auto-Installer Disclosure",
-                "# " + "=" * 70,
-                f"# This file was automatically modified by HyperX installer on "
-                f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-                "#",
-                "# The following changes were made:",
-            ]
+        disclosure_lines = [
+            "",
+            "# " + "=" * 70,
+            "# HyperX Auto-Installer Disclosure",
+            "# " + "=" * 70,
+            f"# This file was automatically modified by HyperX installer on "
+            f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+            "#",
+            "# The following changes were made:",
+        ]
 
-            # Run optional flake8 check once if available
-            if shutil.which("flake8"):
-                subprocess.run(
-                    [
-                        "flake8",
-                        ".",
-                        "--count",
-                        "--select=E9,F63,F7,F82",
-                        "--show-source",
-                        "--statistics",
-                    ],
-                    check=False,
-                )
+        # Run optional flake8 check once if available
+        if shutil.which("flake8"):
+            subprocess.run(
+                [
+                    "flake8",
+                    ".",
+                    "--count",
+                    "--select=E9,F63,F7,F82",
+                    "--show-source",
+                    "--statistics",
+                ],
+                check=False,
+            )
 
-            # ───── INSTALLED_APPS section ─────
-            if changes_made and changes_made.get("apps_added"):
-                disclosure_lines.extend(
-                    [
-                        "#",
-                        "# ✅ INSTALLED_APPS - Added:",
-                    ]
-                )
-                for app in changes_made["apps_added"]:
-                    clean_app = app.strip('"')
-                    disclosure_lines.append(f"#    • {clean_app}")
-
-            # ───── MIDDLEWARE section ─────
-            if changes_made and changes_made.get("middleware_added"):
-                disclosure_lines.extend(
-                    [
-                        "#",
-                        "# ✅ MIDDLEWARE - Added:",
-                    ]
-                )
-                for mw in changes_made["middleware_added"]:
-                    mw_name = mw.strip('"').split(".")[-1]
-                    disclosure_lines.append(f"#    • {mw_name}")
-
-            # ───── CONFIG section ─────
-            if changes_made and changes_made.get("config_added"):
-                disclosure_lines.extend(
-                    [
-                        "#",
-                        "# ✅ CONFIGURATION - Added:",
-                        "#    • HYPERX_MIDDLEWARE settings",
-                        "#    • HYPERX_SECURITY settings",
-                    ]
-                )
-
-            # ───── Footer ─────
+        # ───── INSTALLED_APPS section ─────
+        if changes_made and changes_made.get("apps_added"):
             disclosure_lines.extend(
                 [
                     "#",
-                    "# 🧹 CLEANUP:",
-                    "#    • Management commands will be auto-removed after installation",
-                    "#    • Prevents cluttering your Django project directory",
+                    "# ✅ INSTALLED_APPS - Added:",
+                ]
+            )
+            for app in changes_made["apps_added"]:
+                clean_app = app.strip('"')
+                disclosure_lines.append(f"#    • {clean_app}")
+
+        # ───── MIDDLEWARE section ─────
+        if changes_made and changes_made.get("middleware_added"):
+            disclosure_lines.extend(
+                [
                     "#",
-                    "# 📚 Documentation: https://github.com/faroncoder/hyperx-htmx",
-                    "# 🔧 To remove HyperX: Delete the added sections above",
-                    f"# 💾 Original backup saved as: {self.backup_path.name}",
-                    "# " + "=" * 70,
+                    "# ✅ MIDDLEWARE - Added:",
+                ]
+            )
+            for mw in changes_made["middleware_added"]:
+                mw_name = mw.strip('"').split(".")[-1]
+                disclosure_lines.append(f"#    • {mw_name}")
+
+        # ───── CONFIG section ─────
+        if changes_made and changes_made.get("config_added"):
+            disclosure_lines.extend(
+                [
+                    "#",
+                    "# ✅ CONFIGURATION - Added:",
+                    "#    • HYPERX_MIDDLEWARE settings",
+                    "#    • HYPERX_SECURITY settings",
                 ]
             )
 
-            if not content.endswith("\n"):
-                content += "\n"
+        # ───── Footer ─────
+        disclosure_lines.extend(
+            [
+                "#",
+                "# 🧹 CLEANUP:",
+                "#    • Management commands will be auto-removed after installation",
+                "#    • Prevents cluttering your Django project directory",
+                "#",
+                "# 📚 Documentation: https://github.com/faroncoder/hyperx-htmx",
+                "# 🔧 To remove HyperX: Delete the added sections above",
+                f"# 💾 Original backup saved as: {self.backup_path.name}",
+                "# " + "=" * 70,
+            ]
+        )
 
-            content += "\n".join(disclosure_lines) + "\n"
-            return content
+        if not content.endswith("\n"):
+            content += "\n"
+
+        content += "\n".join(disclosure_lines) + "\n"
+        return content
 
     def install(self, create_backup: bool = True) -> bool:
         """Main installation method."""
