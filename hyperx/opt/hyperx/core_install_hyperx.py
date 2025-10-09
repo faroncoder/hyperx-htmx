@@ -238,58 +238,58 @@ HYPERX_SECURITY = {
 
 
         
-    def add_hyperx_config(self, content: str) -> Tuple[str, bool]:
-        """Add HyperX configuration at the end of the file."""
-        if 'HYPERX_MIDDLEWARE' in content:
-            print("✅ HyperX configuration already present")
-            return content, False
+    # def add_hyperx_config(self, content: str) -> Tuple[str, bool]:
+    #     """Add HyperX configuration at the end of the file."""
+    #     if 'HYPERX_MIDDLEWARE' in content:
+    #         print("✅ HyperX configuration already present")
+    #         return content, False
             
-        # Add configuration at the end
-        if not content.endswith('\n'):
-            content += '\n'
+    #     # Add configuration at the end
+    #     if not content.endswith('\n'):
+    #         content += '\n'
             
-        content += self.HYPERX_CONFIG
-        print("✅ Added HyperX configuration")
-        return content, True
+    #     content += self.HYPERX_CONFIG
+    #     print("✅ Added HyperX configuration")
+    #     return content, True
         
         
-        if shutil.which("flake8"):
-            subprocess.run(
-                ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
-                "--show-source", "--statistics"],
-                check=False,
-            )
-        else:
-            print("⚠️  flake8 not found, skipping syntax check")
+    #     if shutil.which("flake8"):
+    #         subprocess.run(
+    #             ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
+    #             "--show-source", "--statistics"],
+    #             check=False,
+    #         )
+    #     else:
+    #         print("⚠️  flake8 not found, skipping syntax check")
 
-        # Check if disclosure already exists
-        if 'HyperX Auto-Installer Disclosure' in content:
-            return content
+    #     # Check if disclosure already exists
+    #     if 'HyperX Auto-Installer Disclosure' in content:
+    #         return content
             
-        # Create disclosure based on what was actually changed
-        disclosure_lines = [
-            "",
-            "# " + "="*70,
-            "# HyperX Auto-Installer Disclosure",
-            "# " + "="*70,
-            f"# This file was automatically modified by HyperX installer on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-            "#",
-            "# The following changes were made:",
-        ]
+    #     # Create disclosure based on what was actually changed
+    #     disclosure_lines = [
+    #         "",
+    #         "# " + "="*70,
+    #         "# HyperX Auto-Installer Disclosure",
+    #         "# " + "="*70,
+    #         f"# This file was automatically modified by HyperX installer on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+    #         "#",
+    #         "# The following changes were made:",
+    #     ]
         
        
 
-        if changes_made.get('apps_added'):
-            disclosure_lines.extend([
-                "#",
-                "# ✅ INSTALLED_APPS - Added:",
-            ])
+    #     if changes_made.get('apps_added'):
+    #         disclosure_lines.extend([
+    #             "#",
+    #             "# ✅ INSTALLED_APPS - Added:",
+    #         ])
 
-            for app in (changes_made.get('apps_added') or []):
-                clean_app = app.strip('"')
-                disclosure_lines.append(f"#    • {clean_app}")
+    #         for app in (changes_made.get('apps_added') or []):
+    #             clean_app = app.strip('"')
+    #             disclosure_lines.append(f"#    • {clean_app}")
                 
-                # To run flake8 as a shell command from Python, use subprocess:
+    #             # To run flake8 as a shell command from Python, use subprocess:
         
 
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
