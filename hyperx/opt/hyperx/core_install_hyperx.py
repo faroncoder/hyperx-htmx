@@ -290,7 +290,7 @@ HYPERX_SECURITY = {
                 disclosure_lines.append(f"#    • {clean_app}")
                 
                 # To run flake8 as a shell command from Python, use subprocess:
-        if changes_made.get('middleware_added'):
+        
 
     def add_hyperx_disclosure(self, content: str, changes_made: dict) -> str:
         """Add disclosure comment explaining what HyperX installer modified."""
