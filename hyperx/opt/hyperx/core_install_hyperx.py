@@ -235,6 +235,8 @@ HYPERX_SECURITY = {
             
         print(f"✅ Added {len(missing_middleware)} middleware to MIDDLEWARE")
         return '\n'.join(lines), missing_middleware
+
+
         
     def add_hyperx_config(self, content: str) -> Tuple[str, bool]:
         """Add HyperX configuration at the end of the file."""
@@ -410,59 +412,59 @@ HYPERX_SECURITY = {
 
 
 
-def find_django_settings() -> Optional[str]:
-    """Try to automatically find Django settings file using os.walk search."""
-    
-    # Walk through current directory and subdirectories
-    for root, dirs, files in os.walk('.'):
-        # Skip common non-project directories
-        dirs[:] = [d for d in dirs if d not in {
-            '__pycache__', '.git', '.venv', 'venv', 'env', 
-            'node_modules', '.pytest_cache', '.mypy_cache',
-            'build', 'dist', '.tox'
-        }]
+    def find_django_settings() -> Optional[str]:
+        """Try to automatically find Django settings file using os.walk search."""
         
-        if 'settings.py' in files:
-            settings_path = Path(root) / 'settings.py'
+        # Walk through current directory and subdirectories
+        for root, dirs, files in os.walk('.'):
+            # Skip common non-project directories
+            dirs[:] = [d for d in dirs if d not in {
+                '__pycache__', '.git', '.venv', 'venv', 'env', 
+                'node_modules', '.pytest_cache', '.mypy_cache',
+                'build', 'dist', '.tox'
+            }]
             
-            # Validate it's a Django project by checking for asgi.py or wsgi.py
-            asgi_path = Path(root) / 'asgi.py'
-            wsgi_path = Path(root) / 'wsgi.py'
+            if 'settings.py' in files:
+                settings_path = Path(root) / 'settings.py'
+                
+                # Validate it's a Django project by checking for asgi.py or wsgi.py
+                asgi_path = Path(root) / 'asgi.py'
+                wsgi_path = Path(root) / 'wsgi.py'
+                
+                if asgi_path.exists() or wsgi_path.exists():
+                    print(f"🔍 Found Django project at: {settings_path}")
+                    return str(settings_path.resolve())
+                else:
+                    # Check if it looks like a Django settings file by content
+                    try:
+                        content = settings_path.read_text()
+                        if any(django_marker in content for django_marker in [
+                            'DJANGO_SETTINGS_MODULE', 'INSTALLED_APPS', 'MIDDLEWARE',
+                            'django.contrib', 'ROOT_URLCONF'
+                        ]):
+                            print(f"🔍 Found Django settings file at: {settings_path}")
+                            return str(settings_path.resolve())
+                    except:
+                        continue
+                        
+        return None
+
+
+    def install_hyperx(settings_path: Optional[str] = None) -> bool:
+        """Main installation function."""
+        if not settings_path:
+            settings_path = find_django_settings()
             
-            if asgi_path.exists() or wsgi_path.exists():
-                print(f"🔍 Found Django project at: {settings_path}")
-                return str(settings_path.resolve())
-            else:
-                # Check if it looks like a Django settings file by content
-                try:
-                    content = settings_path.read_text()
-                    if any(django_marker in content for django_marker in [
-                        'DJANGO_SETTINGS_MODULE', 'INSTALLED_APPS', 'MIDDLEWARE',
-                        'django.contrib', 'ROOT_URLCONF'
-                    ]):
-                        print(f"🔍 Found Django settings file at: {settings_path}")
-                        return str(settings_path.resolve())
-                except:
-                    continue
-                    
-    return None
+        if not settings_path:
+            print("❌ Could not find Django settings.py file")
+            print("💡 Please specify the path: install_hyperx('/path/to/settings.py')")
+            return False
+            
+        installer = HyperXInstaller(settings_path)
+        return installer.install()
 
 
-def install_hyperx(settings_path: Optional[str] = None) -> bool:
-    """Main installation function."""
-    if not settings_path:
-        settings_path = find_django_settings()
-        
-    if not settings_path:
-        print("❌ Could not find Django settings.py file")
-        print("💡 Please specify the path: install_hyperx('/path/to/settings.py')")
-        return False
-        
-    installer = HyperXInstaller(settings_path)
-    return installer.install()
-
-
-"""
+    """
 ──────────────────────────────────────────────
 Core Installer for HyperX Environment
 ──────────────────────────────────────────────
