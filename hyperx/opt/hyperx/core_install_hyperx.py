@@ -63,7 +63,9 @@ HYPERX_SECURITY = {
         try:
             content = self.settings_path.read_text()
             self.backup_path.write_text(content)
-            print(f"✅ Backup created: {self.backup_path}")import shutil, subprocess
+            print(f"✅ Backup created: {self.backup_path}")
+            
+            import shutil, subprocess
         if shutil.which("flake8"):
             subprocess.run(
                 ["flake8", ".", "--count", "--select=E9,F63,F7,F82",
