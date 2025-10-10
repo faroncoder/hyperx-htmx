@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 from django.apps import apps
 import importlib
+
 from hyperx.bin.generator.htmx_backend_dashboard import generate_dashboard
 from hyperx.bin.generator.htmx_backend_views import generate_views
 from hyperx.bin.generator.htmx_backend_urls import generate_urls
@@ -36,3 +37,21 @@ def run_build(app_label: str, output_dir=None, templates_dir="templates", silent
     print(f"   • URLs      → {urls_path}\n")
     print(f"🎯 Add to your main urls.py:")
     print(f"   path('', include('{app_label}.urls_{app_label}'))")
+
+
+def find_django_settings(start_dir="."):
+    """Recursively search for settings.py containing SECRET_KEY."""
+    from pathlib import Path
+    import os
+
+    for root, dirs, files in os.walk(start_dir):
+        if "settings.py" in files:
+            settings_path = Path(root) / "settings.py"
+            try:
+                with open(settings_path, "r", encoding="utf-8") as f:
+                    content = f.read()
+                    if "SECRET_KEY" in content:
+                        return settings_path.resolve()
+            except Exception:
+                continue
+    return None

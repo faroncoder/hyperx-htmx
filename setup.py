@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="hyperx-htmx",
-    version="3.2.8",
+    version="3.2.9",
     author="Jeff Panasuik",
     author_email="jeff.panasuik@gmail.com",
     description="Declarative HTMX + Elementy framework for Django",
@@ -34,17 +34,14 @@ setup(
     ],
     entry_points={
         # ✅ Modern Django app autodiscovery (no default_app_config needed)
-        "console_scripts" :[
-            "hx-find = hyperx.bin.autodiscover:main",
-            "hx-install = bin.install_hyperx:main",
+        "console_scripts": [
+            "hx-find = hyperx.bin.autodiscover:Command.run",
+            "hx-install = hyperx.bin.cli.commands.install:main",
             "hyperx = hyperx.bin.hx_cli:main",   # ← unified CLI (this replaces hx-cli)
-            "hx = hyperx.bin.hx_cli:main",       # ← optional short alias
-    ],
-
-    "django.apps": [
-        "hyperx = hyperx.apps.HyperXConfig",
-    ],
+            "hx = hyperx.bin.cli.main:main",       # ← optional short alias
+        ],
     },
+
     project_urls={
         "Documentation": "https://github.com/faroncoder/hyperx-htmx/wiki",
         "Source": "https://github.com/faroncoder/hyperx-htmx",

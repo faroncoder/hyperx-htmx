@@ -14,7 +14,8 @@ from django.templatetags.static import static as static_func
 from django.template.loader import render_to_string
 from bs4 import BeautifulSoup
 from hyperx.core.compiler import HyperXCompiler
-from hyperx.core.core import build_htmx_attrs
+from hyperx.core.core import *
+# 
 
 _logger = logging.getLogger("hyperx")
 register = template.Library()
@@ -140,21 +141,8 @@ def convert_include(tag, attrs):
     except Exception as e:
         return f"<!-- Failed to include {file_path}: {e} -->"
 
-@register_hx_tag("import")
-def convert_import(tag, attrs):
-    css_links, js_scripts = [], []
-    for css_file in attrs.get("css", "").split(","):
-        css_file = css_file.strip()
-        if css_file:
-            css_links.append(f'<link rel="stylesheet" href="{css_file}">')
-    for js_file in attrs.get("js", "").split(","):
-        js_file = js_file.strip()
-        if js_file:
-            js_scripts.append(f'<script src="{js_file}"></script>')
-    inline = attrs.get("inline")
-    if inline:
-        js_scripts.append(f"<script>{inline}</script>")
-    return "\n".join(css_links + js_scripts)
+
+
 
 @register_hx_tag("js")
 def convert_js(tag, attrs):
@@ -224,45 +212,3 @@ def hx_runtime_scripts():
     tags = "\n".join(f'<script type="module" src="{src}"></script>' for src in scripts)
     return mark_safe(tags)
 
-
-@register.simple_tag
-def hx_auto_import_js():
-
-    from django.conf import settings
-    from django.templatetags.static import static
-    import os
-
-    tags = []
-
-    # local JS files
-    js_root = os.path.join(settings.STATIC_ROOT or "", "js")
-    if os.path.isdir(js_root):
-        for fname in sorted(os.listdir(js_root)):
-            if fname.endswith(".js"):
-                src = static(f"js/{fname}")
-                tags.append(f'<script type="text/javascript" src="{% script '{url}' %}"></script>')
-
-    # hard-coded CDN or traditional URLs
-    cdn_scripts = [
-        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/htmx/2.0.2/htmx.min.js",
-    ]
-    for url in cdn_scripts:
-        tags.append(f'<script type="text/javascript" src="{% script '{url}' %}"></script>')
-
-    return "\n".join(tags)
-
-
-    @register_hx_tag("auto_css")
-    def hx_auto_import_css(tag, attrs):
-        
-        tags = []
-
-        # local CSS files
-        locationcss = os.path.join(settings.STATIC_ROOT, "css")
-        if os.path.isdir(locationcss):
-            for fname in sorted(os.listdir(locationcss)):
-                if fname.endswith(".css"):
-                    tags.append(f'<hx:import "css/{fname}" />'
-                    
-                    

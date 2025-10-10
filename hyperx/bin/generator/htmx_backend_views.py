@@ -26,7 +26,7 @@ def {endpoint}_list(request):
         row = "  <tr>" + "".join([
             f"<td>{{escape(str(getattr(obj, f.name)))}}</td>"
             for f in {model_name}._meta.fields if not f.primary_key
-        ]) + f"""
+        ]) + f```
           <td class='text-center'>
             <button class='btn btn-sm btn-outline-primary'
                     hx-get='/{endpoint}/edit/{{obj.id}}/'
@@ -36,16 +36,16 @@ def {endpoint}_list(request):
                     hx-target='#crud-zone' hx-swap='innerHTML'
                     hx-confirm='Delete this item?'>🗑️</button>
           </td>
-        </tr>"""
+        </tr>```
         rows.append(row)
-    table = f"""
+    table = f```
     <hx:panel id="crud-zone">
       <table class="table table-striped table-hover align-middle">
         <thead><tr>{"".join(f"<th>{{f.verbose_name.title()}}</th>" for f in {model_name}._meta.fields if not f.primary_key)}<th>Actions</th></tr></thead>
         <tbody>{''.join(rows)}</tbody>
       </table>
       <hx:pagination source="{endpoint}/list" target="#crud-zone" per-page="{{per_page}}" />
-    </hx:panel>"""
+    </hx:panel>```
     return HttpResponse(table)
 
 @require_http_methods(["POST"])

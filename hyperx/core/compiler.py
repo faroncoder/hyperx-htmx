@@ -12,7 +12,6 @@ from bs4 import BeautifulSoup
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 import json
-from hyperx.templatetags.hyperx import convert_import
 from hyperx.core.core import *
 
 # ─────────────────────────────────────────────

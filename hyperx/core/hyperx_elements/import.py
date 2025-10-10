@@ -16,8 +16,10 @@ def convert_import(tag, attrs):
     html = ""
 
     if css:
-        html += f'<link type="text/css" rel="stylesheet" href="{% static 'css/{css}' %}">\n'
+        html += f'<link type="text/css" rel="stylesheet" href="{static_func(f"css/{css}")}">\n'
     if js:
-        html += f'<script type="text/javascript" src="{% static 'js/{js}' %}"></script>\n'
+        html += f'<script type="text/javascript" src="{static_func(f"js/{js}")}"></script>\n'
 
     return html 
+
+

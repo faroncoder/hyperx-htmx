@@ -22,10 +22,10 @@ from datetime import datetime
 # ───────────────────────────────────────────────
 # 🔍 Django Environment Utilities
 # ───────────────────────────────────────────────
-
-def find_settings_path(settings_file: str = None) -> Path | None:
+def find_settings_path(settings_file: str = None, start_dir=".") -> Path | None:
     """
-    Try to locate the active Django settings.py file.
+    Recursively search for settings.py file starting from start_dir.
+    If settings_file is provided and exists, return its resolved path.
     """
     if settings_file:
         p = Path(settings_file)
@@ -41,10 +41,10 @@ def find_settings_path(settings_file: str = None) -> Path | None:
     except Exception:
         pass
 
-    # Fallback: search common paths
-    for guess in ["settings.py", "./settings.py", "../settings.py"]:
-        if Path(guess).exists():
-            return Path(guess).resolve()
+    # Recursively search for settings.py
+    for root, dirs, files in os.walk(start_dir):
+        if "settings.py" in files:
+            return Path(root) / "settings.py"
 
     print("⚠️ Could not auto-detect Django settings path.")
     return None

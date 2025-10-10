@@ -1,6 +1,6 @@
 import os, time, subprocess
 from datetime import datetime
-from hyperx.bin.cli.utils.systemd import tail_journalctl, watcher_status
+from hyperx.bin.utils.hyperx_diagnostics import tail_journalctl, watcher_status
 
 def watch_dashboard(refresh: int = 5, unit_name="hyperx-dataset-watch.service"):
     """Live terminal dashboard showing HyperX watcher status."""

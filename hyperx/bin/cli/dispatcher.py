@@ -1,9 +1,8 @@
 from hyperx.bin.cli.commands.install import run_install
-from hyperx.bin.cli.commands.check import run_check
-from hyperx.bin.cli.commands.audit import run_audit
+from hyperx.bin.utils.hyperx_diagnostics import *
 from hyperx.bin.cli.commands.postinstall import run_postinstall
-from hyperx.bin.cli.generator import run_build
-from hyperx.bin.cli.monitor import watch_dashboard
+from hyperx.bin.cli.generator import *
+from hyperx.bin.cli.monitor import *
 
 
 def dispatch(args):
@@ -13,6 +12,7 @@ def dispatch(args):
         run_build(args.app_label, args.output_dir, args.templates_dir, args.silent)
     elif cmd == "install":
         run_install(args.settings_path, args.no_backup)
+        check_hyperx(arg=None)
     elif cmd == "check":
         run_check(verbose=args.verbose)
     elif cmd == "audit":
