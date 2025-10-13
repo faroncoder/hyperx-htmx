@@ -12,13 +12,46 @@ from django.http import HttpResponseBadRequest
 from django.utils.deprecation import MiddlewareMixin
 from django.middleware.csrf import get_token
 from django.utils.html import escape
-from hypxer.core.core import parse_xtab_header, validate_htmx_request
+# from hyperx.core.hx.hx_core import *
+from hyperx.core.hx.hx_runtime_compiler import *
+from hyperx.bin.cli.logger.hx_logger import *
+
+# Import validate_htmx_request if available, or define a stub
+try:
+    # from hyperx.core.hx.htmx_validation import validate_htmx_request
+    raise ImportError  # Force fallback to stub
+except ImportError:
+    def validate_htmx_request(request):
+        # Basic validation stub; replace with actual logic as needed
+        return True
+
+_logger = load_logger("hyperx.middleware.middleware")
+_logger_middleware = load_logger("hyperx.core.htmx_implementation.middleware")
+_logger_security = load_logger("hyperx.core.htmx_implementation.security")
+_logger_performance = load_logger("hyperx.core.htmx_implementation.performance")
+
+from hyperx.bin.cli.utils.autodiscover import autodiscover
+
+autodiscover('hyperx.templatetags.htmx_tags')  # ensure tags are loaded
+
+# Define a stub for parse_xtab_header if not imported elsewhere
+def parse_xtab_header(request):
+    """
+    Stub for parsing X-Tab header from request.
+    Replace with actual implementation as needed.
+    """
+    xtab_header = request.headers.get("X-Tab")
+    if xtab_header:
+        # Example: parse key=value pairs separated by semicolons
+        xtab = {}
+        for pair in xtab_header.split(";"):
+            if "=" in pair:
+                k, v = pair.split("=", 1)
+                xtab[k.strip()] = v.strip()
+        return xtab
+    return None
 
 
-logger = logging.getLogger("hyperx.middleware")
-logger_middleware = logging.getLogger("hyperx.core.htmx_implementation.middleware")
-logger_security = logging.getLogger("hyperx.core.htmx_implementation.security")
-logger_performance = logging.getLogger("hyperx.core.htmx_implementation.performance")
 
 
 # ================================================================
@@ -42,7 +75,7 @@ class HyperXMiddleware(MiddlewareMixin):
         self.performance_tracking = self.config.get("PERFORMANCE_TRACKING", True)
         self.strict_xtab_validation = self.config.get("STRICT_XTAB_VALIDATION", False)
 
-        logger_middleware.info("HyperX Middleware initialized with config: %s", self.config)
+        _logger_middleware.info("HyperX Middleware initialized with config: %s", self.config)
         super().__init__(get_response)
 
     # ------------------------------------------------------------
@@ -58,7 +91,7 @@ class HyperXMiddleware(MiddlewareMixin):
             if self.auto_validate_htmx and request.htmx:
                 valid = self._validate_htmx_request(request)
                 if not valid:
-                    logger_security.warning(f"[HyperX] Invalid HTMX request blocked: {request.path}")
+                    _logger_security.warning(f"[HyperX] Invalid HTMX request blocked: {request.path}")
                     return HttpResponseBadRequest("Invalid HTMX request")
 
             if self.security_logging:
@@ -68,7 +101,7 @@ class HyperXMiddleware(MiddlewareMixin):
                 request._hyperx_start_time = time.time()
 
         except Exception as e:
-            logger_middleware.error(f"process_request error: {e}", exc_info=True)
+            _logger.error(f"process_request error: {e}", exc_info=True)
             return None
 
     def __call__(self, request):
@@ -79,7 +112,7 @@ class HyperXMiddleware(MiddlewareMixin):
 
         if self.performance_tracking and start_time:
             duration = (time.time() - start_time) * 1000
-            logger_performance.debug(
+            _logger_performance.debug(
                 f"[HyperX] {request.method} {request.path} - {duration:.2f}ms "
                 f"(HTMX={getattr(request, 'htmx', False)} XTab={bool(getattr(request, 'xtab', None))})"
             )
@@ -115,9 +148,9 @@ class HyperXMiddleware(MiddlewareMixin):
 """
                         html = re.sub(r"</head>", snippet + "</head>", html, flags=re.I)
                         response.content = html.encode("utf-8")
-                        logger.info("[HyperX] Auto-inserted CSRF meta/script.")
+                        _logger.info("[HyperX] Auto-inserted CSRF meta/script.")
         except Exception as e:
-            logger.error(f"[HyperX] CSRF injection failed: {e}", exc_info=True)
+            _logger.error(f"[HyperX] CSRF injection failed: {e}", exc_info=True)
 
         return response
 
@@ -135,23 +168,23 @@ class HyperXMiddleware(MiddlewareMixin):
             xtab = parse_xtab_header(request)
             if xtab and self.strict_xtab_validation:
                 if not all(xtab.get(k) for k in ["tab", "function", "command", "version"]):
-                    logger_security.warning(f"Incomplete X-Tab header: {xtab}")
+                    _logger_security.warning(f"Incomplete X-Tab header: {xtab}")
                     return None
             return xtab
         except Exception as e:
-            logger_middleware.error(f"Error parsing X-Tab header: {e}")
+            _logger_middleware.error(f"Error parsing X-Tab header: {e}")
             return None
 
     def _validate_htmx_request(self, request):
         try:
             return validate_htmx_request(request)
         except Exception as e:
-            logger_middleware.error(f"Error validating HTMX request: {e}")
+            _logger_middleware.error(f"Error validating HTMX request: {e}")
             return False
 
     def _log_security_info(self, request):
         if request.htmx:
-            logger_security.info(
+            _logger_security.info(
                 f"HTMX request {request.method} {request.path} "
                 f"IP={request.META.get('REMOTE_ADDR')} UA={request.META.get('HTTP_USER_AGENT', '')[:100]}"
             )
@@ -171,12 +204,12 @@ class HyperXSecurityMiddleware(MiddlewareMixin):
         self.enable_pattern_detection = self.config.get("PATTERN_DETECTION", True)
         self.enable_auto_blocking = self.config.get("AUTO_BLOCKING", False)
         self.max_requests_per_minute = self.config.get("MAX_REQUESTS_PER_MINUTE", 60)
-        logger_security.info("HyperX Security Middleware initialized")
+        _logger_security.info("HyperX Security Middleware initialized")
         super().__init__(get_response)
 
     def __call__(self, request):
         if not self._security_check(request):
-            logger_security.error(f"Security check failed for {request.path}")
+            _logger_security.error(f"Security check failed for {request.path}")
             return HttpResponseBadRequest("Request blocked by HyperX security")
         return self.get_response(request)
 
@@ -202,7 +235,7 @@ class HyperXSecurityMiddleware(MiddlewareMixin):
         suspicious = ["bot", "crawler", "spider", "scan"]
         ua = request.META.get("HTTP_USER_AGENT", "").lower()
         if any(p in ua for p in suspicious):
-            logger_security.warning(f"Suspicious UA detected: {ua}")
+            _logger_security.warning(f"Suspicious UA detected: {ua}")
         return True
 
     def _validate_xtab_security(self, request):
@@ -210,6 +243,6 @@ class HyperXSecurityMiddleware(MiddlewareMixin):
         bad_chars = ['<', '>', '"', "'", '&', ';', '|', '`']
         for field, value in xtab.items():
             if any(c in str(value) for c in bad_chars):
-                logger_security.error(f"X-Tab injection attempt: {field}={value}")
+                _logger_security.error(f"X-Tab injection attempt: {field}={value}")
                 return False
         return True

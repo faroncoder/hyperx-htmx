@@ -4,21 +4,49 @@ hyperx/templatetags/hyperx.py
 Declarative <hx:*> template tag system with compiler integration.
 Auto-includes Bootstrap, static, and runtime helpers.
 """
+from django import template
+register = template.Library()
+from hyperx.bin.cli.logger.hx_logger import load_logger
+from hyperx.core.hx.hx_converter import register_hx_tag
+from hyperx.core.hx.hx_actions_rules import build_htmx_attrs
+from django.utils.html import escape
+import json
+import hashlib
 
-import importlib, pkgutil, logging, json
 from django import template
 from django.conf import settings
 from django.utils.safestring import mark_safe
-from django.template.library import import_library
 from django.templatetags.static import static as static_func
 from django.template.loader import render_to_string
+from django.template import engines
+from django.template.library import import_library
 from bs4 import BeautifulSoup
-from hyperx.core.compiler import HyperXCompiler
-from hyperx.core.core import *
-# 
 
-_logger = logging.getLogger("hyperx")
+
+
+_logger = load_logger("hyperx.templatetags.hyperx")
+_logger.info("hyperx.templatetags.hyperx initializing")
+
+from  hyperx.core.hx.hx_converter import register_hx_tag, TAG_CONVERTERS
+
+
+
+
 register = template.Library()
+
+# autodiscover("hyperx.templatetags")
+
+_logger.info("hyperx.templatetags modules autodiscovered")
+
+
+# from hyperx.core.hx.hx_converter import register_hx_tag, TAG_CONVERTERS
+# from hyperx.core.hx.hx_runtime_compiler import HyperXCompiler
+# from hyperx.templatetags.hyperx_elements.generic import convert_generic
+
+
+
+
+
 
 # ─────────────────────────────────────────────
 #  Django built-ins
@@ -27,19 +55,39 @@ register = template.Library()
 def static(path):
     return static_func(path)
 
+# Register 'load static' so it's available when 'load hyperx' is used
+
+engines['django'].engine.template_libraries['static'] = 'django.templatetags.static'
+_logger.info("[HyperX] Django 'static' tag registered") 
+
+
 try:
-    bootstrap_lib = import_library("bootstrap5")
+    bootstrap_lib = import_library("django_bootstrap5")
+    _logger.info("[HyperX] Bootstrap5 (django-bootstrap5) detected")
 except Exception:
+    _logger.warning("[HyperX] django-bootstrap5 not found, trying django-bootstrap4...")
     try:
-        bootstrap_lib = import_library("django_bootstrap5")
+        bootstrap_lib = import_library("django_bootstrap4   ")
+        _logger.info("[HyperX] Bootstrap4 (django-bootstrap4) detected")
     except Exception:
         bootstrap_lib = None
+        _logger.warning("[HyperX] django-bootstrap5 and django-bootstrap4 not found, Bootstrap tags unavailable")
 
 if bootstrap_lib:
-    for n, t in bootstrap_lib.tags.items():
+    for n, t in getattr(bootstrap_lib, "tags", {}).items():
         register.tag(n, t)
-    for n, f in bootstrap_lib.filters.items():
+        tags = getattr(t, "tags", [])
+        for tag in tags:
+            register.tag(tag, getattr(t, tag))
+            _logger.info(f"[HyperX] Bootstrap5 tag '{tag}' registered")
+
+    for n, f in getattr(bootstrap_lib, "filters", {}).items():
         register.filter(n, f)
+        filters = getattr(f, "filters", [])
+        for flt in filters:
+            register.filter(flt, getattr(f, flt))
+            _logger.info(f"[HyperX] Bootstrap5 filter '{flt}' registered")
+
     _logger.info("[HyperX] Bootstrap5 tags merged")
 else:
     _logger.warning("[HyperX] Bootstrap5 not found")
@@ -47,84 +95,8 @@ else:
 # ─────────────────────────────────────────────
 #  Tag converter registry
 # ─────────────────────────────────────────────
-TAG_CONVERTERS = {}
 
-def register_hx_tag(tag_name):
-    def wrapper(func):
-        TAG_CONVERTERS[tag_name] = func
-        return func
-    return wrapper
 
-# ─────────────────────────────────────────────
-#  Basic converters
-# ─────────────────────────────────────────────
-@register_hx_tag("panel")
-def convert_panel(tag, attrs):
-    htmx = build_htmx_attrs(**attrs)
-    attrs = " ".join(f'{k}="{v}"' for k, v in htmx.items())
-    return f"<div {attrs}></div>"
-
-@register_hx_tag("button")
-def convert_button(tag, attrs):
-    label = attrs.get("label", "Action")
-    htmx = build_htmx_attrs(**attrs)
-    attrs = " ".join(f'{k}="{v}"' for k, v in htmx.items())
-    return f"<button {attrs}>{label}</button>"
-
-@register_hx_tag("xtab")
-def convert_xtab(tag, attrs):
-    headers = {"X-Tab": f"{attrs.get('name')}:{attrs.get('version','1')}:{attrs.get('function')}:{attrs.get('command')}"}
-    htmx = build_htmx_attrs(**attrs)
-    htmx["hx-headers"] = json.dumps(headers)
-    attrs = " ".join(f'{k}="{v}"' for k, v in htmx.items())
-    return f"<div {attrs}></div>"
-
-def convert_generic(tag, attrs):
-    htmx = build_htmx_attrs(**attrs)
-    attrs_str = " ".join(f'{k}="{v}"' for k, v in htmx.items())
-    return f"<div {attrs_str}></div>"
-
-# ─────────────────────────────────────────────
-#  Specialized converters (meta, chat, include, import, js)
-# ─────────────────────────────────────────────
-@register_hx_tag("meta")
-def convert_meta(tag, attrs):
-    tag_type = attrs.get("type", "meta")
-    title, description = attrs.get("title"), attrs.get("description")
-    name, content, data = attrs.get("name"), attrs.get("content"), attrs.get("data")
-    element_id = attrs.get("id")
-    frags = []
-    if title: frags.append(f"<title>{title}</title>")
-    if description: frags.append(f'<meta name="description" content="{description}">')
-    if name and content: frags.append(f'<meta name="{name}" content="{content}">')
-    if tag_type.lower() == "json" and data:
-        frags.append(f'<script id="{element_id or "hx-data"}" type="application/json">{data}</script>')
-    return "\n".join(frags)
-
-@register_hx_tag("chat")
-def convert_chat(tag, attrs):
-    model = attrs.get("model", "gpt-4o-mini")
-    title = attrs.get("title", "AI Chat Assistant")
-    return f"""<div class="card shadow-lg border-0" id="aichat-card">
-  <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>{title}</h5>
-    <small class="text-muted">Model: {model}</small>
-  </div>
-  <div class="card-body" id="aichat-body" style="height:400px;overflow-y:auto;">
-    <div class="text-muted text-center mt-5">Start chatting with {title}...</div>
-  </div>
-  <div class="card-footer bg-light">
-    <form hx-post="/lti/developer/tools/aichat/send/" hx-target="#aichat-body" hx-swap="beforeend" hx-indicator=".chat-loader">
-      <div class="input-group">
-        <input type="text" name="prompt" class="form-control" placeholder="Type a message..." required />
-        <button type="submit" class="btn btn-primary">Send</button>
-      </div>
-    </form>
-    <div class="chat-loader text-center mt-2" style="display:none;">
-      <i class="fas fa-spinner fa-spin"></i> Thinking...
-    </div>
-  </div>
-</div>"""
 
 @register_hx_tag("include")
 def convert_include(tag, attrs):
@@ -142,31 +114,6 @@ def convert_include(tag, attrs):
         return f"<!-- Failed to include {file_path}: {e} -->"
 
 
-
-
-@register_hx_tag("js")
-def convert_js(tag, attrs):
-    subtype = tag.name.split(":")[1]
-    if subtype == "fetch":
-        url, method, then = attrs.get("url"), attrs.get("method", "GET").upper(), attrs.get("then", "")
-        return f"""
-        <script>
-        fetch("{url}", {{method:"{method}"}})
-          .then(r=>r.text())
-          .then(html=>{{const [sel,tgt] = "{then}".split(":"); if(sel==="render") document.querySelector(tgt).innerHTML = html;}});
-        </script>
-        """
-    if subtype == "on":
-        event, target, url = attrs.get("event","click"), attrs.get("target"), attrs.get("url","")
-        return f"""
-        <script>
-        document.querySelector("{target}").addEventListener("{event}", async()=>{{
-            const res = await fetch("{url}"); const html = await res.text();
-            document.querySelector("{attrs.get('then','#output')}").innerHTML = html;
-        }});
-        </script>
-        """
-    return "<!-- Unknown hxjs subtype -->"
 
 # ─────────────────────────────────────────────
 #  {% hx %} compiler tag
@@ -208,7 +155,16 @@ def hx_runtime_scripts():
         static("hxjs/loader.js"),
         static("hxjs/dragdrop.js"),
         static("hxjs/drawer.js"),
+        static("js/hyperx-events.js"),
+        static("js/hyperx-core.js"),
     ]
     tags = "\n".join(f'<script type="module" src="{src}"></script>' for src in scripts)
     return mark_safe(tags)
 
+
+
+
+
+def make_hx_pair(user_id, secret):
+    token = hashlib.sha1(f"{user_id}{secret}".encode()).hexdigest()[:12]
+    return f"HX-{token}"

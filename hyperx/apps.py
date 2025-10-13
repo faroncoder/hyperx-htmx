@@ -1,8 +1,7 @@
-# hyperx/apps.py
 from django.apps import AppConfig
 from django.conf import settings
-import logging
-import sys
+import logging, sys
+from pathlib import Path
 
 class HyperXConfig(AppConfig):
     name = "hyperx"
@@ -11,20 +10,20 @@ class HyperXConfig(AppConfig):
     default_auto_field = "django.db.models.AutoField"
 
     def ready(self):
-        """
-        Runs once when Django app registry is ready.
-        Safely loads HyperX's compiler & tags without circular imports.
-        """
+        """Runs once when Django app registry is ready."""
         self.logger = logging.getLogger("hyperx")
 
-        # Skip autodiscover in management commands that don't need runtime loading
+        # ─────────────────────────────────────────────
+        # Skip mgmt commands
+        # ─────────────────────────────────────────────
         if any(cmd in sys.argv for cmd in ("makemigrations", "migrate", "collectstatic", "shell")):
-            self.logger.debug("[HyperX] Skipping autodiscover during management command.")
+            self.logger.debug("[HyperX] Skipping runtime load during management command.")
             return
 
+        # ─────────────────────────────────────────────
+        # Autodiscover
+        # ─────────────────────────────────────────────
         try:
-            # Perform lazy import to avoid circular load during Django startup
-            # from importlib import import_module
             from hyperx.autodiscover import autodiscover
             autodiscover()
             self.logger.info("⚡ HyperX autodiscover() executed successfully.")
@@ -33,6 +32,22 @@ class HyperXConfig(AppConfig):
         except Exception as e:
             self.logger.exception(f"❌ HyperX AppConfig startup error: {e}")
 
-        # Optional: show runtime context for developers
+        # ─────────────────────────────────────────────
+        # Check structure: bin and lib
+        # ─────────────────────────────────────────────
+        root_path = Path(__file__).resolve().parent
+        bin_path = root_path / "bin"
+        lib_path = root_path / "lib"
+
+        if not bin_path.exists():
+            self.logger.warning(f"[HyperX] Missing bin directory: {bin_path}")
+        else:
+            self.logger.debug(f"[HyperX] Found bin directory: {bin_path}")
+
+        if not lib_path.exists():
+            self.logger.warning(f"[HyperX] Missing lib directory: {lib_path}")
+        else:
+            self.logger.debug(f"[HyperX] Found lib directory: {lib_path}")
+
         if getattr(settings, "DEBUG", False):
             self.logger.info("[HyperX] DEBUG mode detected — runtime helpers will auto-inject.")

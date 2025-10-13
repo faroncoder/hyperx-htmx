@@ -1,41 +1,49 @@
-/**
- * hyperx-events.js
- * ────────────────────────────────────────────────
- * Global event listeners for HyperX declarative system.
- * Handles dataset uploads, AI schema events, and UI feedback.
- */
-
-document.addEventListener("DOMContentLoaded", () => {
+// hyperx-events.js
+(() => {
   console.log("⚡ HyperX Events Initialized");
 
-  // 🔹 React to dataset uploads
-  document.body.addEventListener("dataset:uploaded", (e) => {
-    const data = e.detail || {};
-    console.log("📦 New dataset uploaded:", data.filename);
+  const HX_SESSION_PAIR = window.HX_PAIR || null;
 
-    // Refresh dataset dashboards if present
-    const container = document.querySelector("#intel-container, #dataset-panel");
-    if (container && window.htmx) {
-      htmx.ajax("GET", "/lti/admin/course_table_view/", {
-        target: container,
-        swap: "innerHTML",
-      });
+  function verifyPair(el) {
+    const pair = el.getAttribute("hx-pair");
+    if (!pair || pair !== HX_SESSION_PAIR) {
+      console.warn("❌ HX Pair verification failed", { pair, expected: HX_SESSION_PAIR });
+      return false;
     }
+    return true;
+  }
 
-    // Bootstrap toast notification
-    const toast = document.createElement("div");
-    toast.className = "position-fixed top-0 end-0 p-3";
-    toast.style.zIndex = 9999;
-    toast.innerHTML = `
-      <div class="toast align-items-center text-bg-success show border-0 shadow-lg" role="alert">
-        <div class="d-flex">
-          <div class="toast-body">
-            ✅ Dataset <b>${data.filename}</b> uploaded successfully!
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-        </div>
-      </div>`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 6000);
-  });
-});
+  function handleHxFetch(el) {
+    if (!verifyPair(el)) return; // 🔒 kill unverified hxjs
+    const url = el.getAttribute("hx-url");
+    const method = el.getAttribute("hx-method") || "GET";
+    const thenSel = el.getAttribute("hx-then");
+    const action = el.getAttribute("hx-action") || "render";
+
+    if (!url) return;
+
+    fetch(url, { method })
+      .then(r => r.text())
+      .then(html => {
+        if (action === "render" && thenSel) {
+          const tgt = document.querySelector(thenSel);
+          if (tgt) tgt.innerHTML = html;
+        }
+      })
+      .catch(err => console.error("HX Fetch error:", err));
+  }
+
+  function attachHxEvents() {
+    document.querySelectorAll("[hx-on]").forEach(el => {
+      const evt = el.getAttribute("hx-on") || "click";
+      el.addEventListener(evt, e => handleHxFetch(el));
+    });
+  }
+
+  attachHxEvents();
+
+  // Observe DOM for new HX elements
+  const observer = new MutationObserver(attachHxEvents);
+  observer.observe(document.body, { childList: true, subtree: true });
+
+})();

@@ -1,26 +1,12 @@
 """
-🚀 HyperX - HTMX 
-================================================================
-TabX so fast! The ultimate HTMX enhancement protocol for Django.
-
-MIT License - Copyright (c) 2025 Faron
-https://github.com/faroncoder/hyperx-htmx
-
-Features:
-- Lightning-fast TabX protocol (X-Tab system)
-- Declarative <hx:*> Template Tag Compiler
-- Attribute generation and parsing
-- Security validation and authentication
-- Response helpers and decorators
-- Performance monitoring and logging
-- Live Dataset Watcher + AI Schema Autogen (optional)
+HyperX package initializer (auto-generated)
+────────────────────────────────────────────
+Updated: 2025-10-12T23:15:35.869621
+Do not edit manually; use bin/cli/generator/update_init.py
 """
 
 from __future__ import annotations
-import sys
-import importlib
-import logging
-
+import sys, importlib, logging
 from pathlib import Path
 
 __version__ = "3.0.0"
@@ -29,52 +15,13 @@ __email__ = "jeff.panasuik@gmail.com"
 __license__ = "MIT"
 __url__ = "https://github.com/faroncoder/hyperx-htmx"
 
-# ─────────────────────────────────────────────
-# 🧱 Core Imports
-# ─────────────────────────────────────────────
-from hyperx.core.core import *
-
-
-# ─────────────────────────────────────────────
-# 🧠 Middleware
-# ─────────────────────────────────────────────
 from hyperx.middleware import *
 
-# ─────────────────────────────────────────────
-# 🧩 Elements Autoload
-# ─────────────────────────────────────────────
-try:
-    import hyperx.core.hyperx_elements  # auto-discovers declarative <hx:*> components
-    ELEMENTS_REGISTERED = True
-except Exception as e:
-    ELEMENTS_REGISTERED = False
-    logging.getLogger("hyperx").warning(f"[HyperX] Elements library not loaded: {e}")
-
-# ─────────────────────────────────────────────
-# 🧠 Auto-Installer Integration
-# ─────────────────────────────────────────────
-    
+ELEMENTS_REGISTERED = False
+AI_TOOLS_AVAILABLE = False
+WATCHER_AVAILABLE = False
 
 
-
-# ─────────────────────────────────────────────
-# 🧩 Optional AI + Dataset Watcher
-# ─────────────────────────────────────────────
-try:
-    from hyperx.opt.hyperx.ai_schema_autogen import *  # noqa
-    AI_TOOLS_AVAILABLE = True
-except ImportError:
-    AI_TOOLS_AVAILABLE = False
-
-try:
-    from hyperx.opt.hyperx.dataset_watch_service import *  # noqa
-    WATCHER_AVAILABLE = True
-except ImportError:
-    WATCHER_AVAILABLE = False
-
-# ─────────────────────────────────────────────
-# 🧭 Logging Initialization
-# ─────────────────────────────────────────────
 _logger = logging.getLogger("hyperx")
 if not _logger.handlers:
     handler = logging.StreamHandler()
@@ -87,52 +34,3 @@ _logger.info(f"   🧩 Elements Registered: {ELEMENTS_REGISTERED}")
 _logger.info(f"   🧠 AI Tools: {AI_TOOLS_AVAILABLE}")
 _logger.info(f"   👁️ Watcher: {WATCHER_AVAILABLE}")
 
-# ─────────────────────────────────────────────
-# 🔖 Public API
-# ─────────────────────────────────────────────
-__all__ = [
-    # Core functionality
-    "build_htmx_attrs",
-    "htmx_form_submit",
-    "htmx_infinite_scroll",
-    "validate_htmx_request",
-    "is_htmx_request",
-    "render_htmx",
-    # Response helpers
-    "hx_redirect",
-    "hx_refresh",
-    "hx_location",
-    "hx_push_url",
-    "hx_replace_url",
-    "hx_retarget",
-    "hx_reswap",
-    "hx_trigger",
-    # Authentication
-    "htmx_login_required",
-    # TabX
-    "parse_xtab_header",
-    "validate_xtab_request",
-    "xtab_required",
-    # Middleware
-    "HyperXMiddleware",
-    "HyperXSecurityMiddleware",
-    # Auto-installer
-    "install_hyperx",
-    "HyperXInstaller",
-    # Metadata
-    "__version__",
-    "__author__",
-    "__license__",
-    "__url__",
-]
-
-
-default_app_config = "hyperx.apps.HyperXConfig"
-
-
-
-
-
-
-
-   
