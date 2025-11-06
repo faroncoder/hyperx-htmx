@@ -1,0 +1,541 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/json_enc.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/ws.js' %}"></script>
+  
+  <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+
+    <!-- Feather Icons -->
+
+      <script type ="text/javascript" src="{% static 'js/feather.min.js' %}"></script>
+        <script type ="text/javascript" src="{% static 'js/loader.js' %}"></script>
+
+</head>
+<body>
+<!-- User Interface Components -->
+<div class="row">
+    <!-- Modal Examples -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dynamic Modals</h5>
+                <small class="text-muted">HTMX-powered modal interactions</small>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-primary"
+                            {% htmx_get '/declaratives/component/modal/content/' %}
+                            {% htmx_params 'type=user_profile' %}
+                            {% htmx_target '#modal-container' %}
+                            data-bs-toggle="modal" data-bs-target="#componentModal">
+                        <i data-feather="user"></i> User Profile Modal
+                    </button>
+                    
+                    <button type="button" class="btn btn-success"
+                            {% htmx_get '/declaratives/component/modal/content/' %}
+                            {% htmx_params 'type=create_task' %}
+                            {% htmx_target '#modal-container' %}
+                            data-bs-toggle="modal" data-bs-target="#componentModal">
+                        <i data-feather="plus"></i> Create Task Modal
+                    </button>
+                    
+                    <button type="button" class="btn btn-info"
+                            {% htmx_get '/declaratives/component/modal/content/' %}
+                            {% htmx_params 'type=image_gallery' %}
+                            {% htmx_target '#modal-container' %}
+                            data-bs-toggle="modal" data-bs-target="#componentModal">
+                        <i data-feather="image"></i> Image Gallery Modal
+                    </button>
+                    
+                    <button type="button" class="btn btn-warning"
+                            {% htmx_get '/declaratives/component/modal/content/' %}
+                            {% htmx_params 'type=confirmation' %}
+                            {% htmx_target '#modal-container' %}
+                            data-bs-toggle="modal" data-bs-target="#componentModal">
+                        <i data-feather="alert-triangle"></i> Confirmation Modal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dropdown & Navigation -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dynamic Dropdowns</h5>
+                <small class="text-muted">Interactive dropdown menus</small>
+            </div>
+            <div class="card-body">
+                <!-- Search Dropdown -->
+                <div class="mb-4">
+                    <label class="form-label">Search Dropdown</label>
+                    <div class="dropdown">
+                        <input type="text" class="form-control dropdown-toggle" 
+                               data-bs-toggle="dropdown" 
+                               placeholder="Search users..."
+                               {% htmx_get '/declaratives/component/ui/search-dropdown/' %}
+                               {% htmx_trigger 'keyup changed delay:300ms' %}
+                               {% htmx_target '#search-results' %}
+                               {% htmx_params 'q=' %}
+                               autocomplete="off">
+                        <ul class="dropdown-menu w-100" id="search-results">
+                            <li class="dropdown-item-text text-muted">
+                                <small>Start typing to search...</small>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Multi-select Dropdown -->
+                <div class="mb-4">
+                    <label class="form-label">Tags Selection</label>
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" 
+                                type="button" data-bs-toggle="dropdown">
+                            <span id="selected-tags">Select tags...</span>
+                        </button>
+                        <div class="dropdown-menu w-100 p-2" id="tags-dropdown"
+                             {% htmx_get '/declaratives/component/ui/tags-dropdown/' %}
+                             {% htmx_trigger 'load' %}
+                             {% htmx_swap 'innerHTML' %}>
+                            <!-- Tag checkboxes will be loaded here -->
+                        </div>
+                    </div>
+                    <div id="selected-tags-display" class="mt-2">
+                        <!-- Selected tags will appear here -->
+                    </div>
+                </div>
+
+                <!-- Action Dropdown -->
+                <div class="mb-4">
+                    <label class="form-label">Bulk Actions</label>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle w-100" 
+                                type="button" data-bs-toggle="dropdown">
+                            Choose Action...
+                        </button>
+                        <ul class="dropdown-menu w-100">
+                            <li>
+                                <a class="dropdown-item" href="#"
+                                   {% htmx_post '/declaratives/component/ui/bulk-action/' %}
+                                   {% htmx_params 'action=export' %}
+                                   {% htmx_target '#action-result' %}>
+                                    <i data-feather="download"></i> Export Selected
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#"
+                                   {% htmx_post '/declaratives/component/ui/bulk-action/' %}
+                                   {% htmx_params 'action=archive' %}
+                                   {% htmx_target '#action-result' %}>
+                                    <i data-feather="archive"></i> Archive Selected
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#"
+                                   {% htmx_delete_confirm "/declaratives/component/ui/bulk-action/delete/" "#action-result" "Are you sure you want to delete selected items?" %}>
+                                    <i data-feather="trash-2"></i> Delete Selected
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="action-result" class="mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tabs & Accordion -->
+<div class="row mt-4">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dynamic Tabs</h5>
+                <small class="text-muted">Lazy-loaded tab content</small>
+            </div>
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="dynamic-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview-tab"
+                                {% htmx_get '/declaratives/component/ui/tab-content/' %}
+                                {% htmx_params 'tab=overview' %}
+                                {% htmx_target '#overview-tab' %}
+                                {% htmx_trigger 'click' %}>
+                            Overview
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#analytics-tab"
+                                {% htmx_get '/declaratives/component/ui/tab-content/' %}
+                                {% htmx_params 'tab=analytics' %}
+                                {% htmx_target '#analytics-tab' %}
+                                {% htmx_trigger 'click once' %}>
+                            Analytics
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#settings-tab"
+                                {% htmx_get '/declaratives/component/ui/tab-content/' %}
+                                {% htmx_params 'tab=settings' %}
+                                {% htmx_target '#settings-tab' %}
+                                {% htmx_trigger 'click once' %}>
+                            Settings
+                        </button>
+                    </li>
+                </ul>
+                <div class="tab-content mt-3">
+                    <div class="tab-pane fade show active" id="overview-tab">
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <div class="mt-2 text-muted">Loading overview...</div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="analytics-tab">
+                        <div class="text-muted text-center py-4">
+                            Click Analytics tab to load content
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="settings-tab">
+                        <div class="text-muted text-center py-4">
+                            Click Settings tab to load content
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Interactive Accordion</h5>
+                <small class="text-muted">Expandable content sections</small>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="dynamic-accordion">
+                    <!-- FAQ Section -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#faq-section"
+                                    {% htmx_get '/declaratives/component/ui/accordion-content/' %}
+                                    {% htmx_params 'section=faq' %}
+                                    {% htmx_target '#faq-section .accordion-body' %}
+                                    {% htmx_trigger 'click once' %}>
+                                Frequently Asked Questions
+                            </button>
+                        </h2>
+                        <div id="faq-section" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <div class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                    <div class="mt-2 small text-muted">Loading FAQ...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Documentation Section -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#docs-section"
+                                    {% htmx_get '/declaratives/component/ui/accordion-content/' %}
+                                    {% htmx_params 'section=documentation' %}
+                                    {% htmx_target '#docs-section .accordion-body' %}
+                                    {% htmx_trigger 'click once' %}>
+                                Documentation
+                            </button>
+                        </h2>
+                        <div id="docs-section" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <div class="text-muted text-center py-3">
+                                    Click to load documentation...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Reference Section -->
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" 
+                                    data-bs-toggle="collapse" data-bs-target="#api-section"
+                                    {% htmx_get '/declaratives/component/ui/accordion-content/' %}
+                                    {% htmx_params 'section=api' %}
+                                    {% htmx_target '#api-section .accordion-body' %}
+                                    {% htmx_trigger 'click once' %}>
+                                API Reference
+                            </button>
+                        </h2>
+                        <div id="api-section" class="accordion-collapse collapse">
+                            <div class="accordion-body">
+                                <div class="text-muted text-center py-3">
+                                    Click to load API reference...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notifications & Alerts -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Toast Notifications & Alerts</h5>
+                <small class="text-muted">Dynamic notification system</small>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Toast Triggers -->
+                    <div class="col-md-6">
+                        <h6>Toast Notifications</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success"
+                                    {% htmx_post '/declaratives/component/ui/toast/' %}
+                                    {% htmx_params 'type=success&message=Operation completed successfully!' %}
+                                    {% htmx_target '#toast-container' %}
+                                    {% htmx_swap 'afterbegin' %}>
+                                <i data-feather="check-circle"></i> Success Toast
+                            </button>
+                            
+                            <button class="btn btn-warning"
+                                    {% htmx_post '/declaratives/component/ui/toast/' %}
+                                    {% htmx_params 'type=warning&message=This is a warning message.' %}
+                                    {% htmx_target '#toast-container' %}
+                                    {% htmx_swap 'afterbegin' %}>
+                                <i data-feather="alert-triangle"></i> Warning Toast
+                            </button>
+                            
+                            <button class="btn btn-danger"
+                                    {% htmx_post '/declaratives/component/ui/toast/' %}
+                                    {% htmx_params 'type=error&message=An error occurred while processing.' %}
+                                    {% htmx_target '#toast-container' %}
+                                    {% htmx_swap 'afterbegin' %}>
+                                <i data-feather="x-circle"></i> Error Toast
+                            </button>
+                            
+                            <button class="btn btn-info"
+                                    {% htmx_post '/declaratives/component/ui/toast/' %}
+                                    {% htmx_params 'type=info&message=Here is some useful information.' %}
+                                    {% htmx_target '#toast-container' %}
+                                    {% htmx_swap 'afterbegin' %}>
+                                <i data-feather="info"></i> Info Toast
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alert Examples -->
+                    <div class="col-md-6">
+                        <h6>Dynamic Alerts</h6>
+                        <div id="alerts-container" class="mb-3">
+                            <!-- Dynamic alerts will appear here -->
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary"
+                                    {% htmx_get '/declaratives/component/ui/alert/' %}
+                                    {% htmx_params 'type=info&title=System Update&message=New features have been deployed.' %}
+                                    {% htmx_target '#alerts-container' %}
+                                    {% htmx_swap 'innerHTML' %}>
+                                Show Info Alert
+                            </button>
+                            
+                            <button class="btn btn-outline-success"
+                                    {% htmx_get '/declaratives/component/ui/alert/' %}
+                                    {% htmx_params 'type=success&title=Backup Complete&message=Your data has been safely backed up.' %}
+                                    {% htmx_target '#alerts-container' %}
+                                    {% htmx_swap 'innerHTML' %}>
+                                Show Success Alert
+                            </button>
+                            
+                            <button class="btn btn-outline-warning"
+                                    {% htmx_get '/declaratives/component/ui/alert/' %}
+                                    {% htmx_params 'type=warning&title=Storage Warning&message=You are running low on storage space.' %}
+                                    {% htmx_target '#alerts-container' %}
+                                    {% htmx_swap 'innerHTML' %}>
+                                Show Warning Alert
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Carousel & Image Gallery -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dynamic Carousel & Gallery</h5>
+                <small class="text-muted">Interactive image components</small>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div id="image-carousel"
+                             {% htmx_get '/declaratives/component/ui/carousel/' %}
+                             {% htmx_trigger 'load' %}
+                             {% htmx_swap 'innerHTML' %}>
+                            
+                            <!-- Carousel placeholder -->
+                            <div class="bg-light rounded text-center py-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading carousel...</span>
+                                </div>
+                                <div class="mt-2 text-muted">Loading image carousel...</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <h6>Gallery Controls</h6>
+                        <div class="d-grid gap-2 mb-3">
+                            <button class="btn btn-primary"
+                                    {% htmx_get '/declaratives/component/ui/carousel/' %}
+                                    {% htmx_params 'category=nature' %}
+                                    {% htmx_target '#image-carousel' %}>
+                                <i data-feather="image"></i> Nature Gallery
+                            </button>
+                            
+                            <button class="btn btn-secondary"
+                                    {% htmx_get '/declaratives/component/ui/carousel/' %}
+                                    {% htmx_params 'category=technology' %}
+                                    {% htmx_target '#image-carousel' %}>
+                                <i data-feather="monitor"></i> Technology
+                            </button>
+                            
+                            <button class="btn btn-success"
+                                    {% htmx_get '/declaratives/component/ui/carousel/' %}
+                                    {% htmx_params 'category=architecture' %}
+                                    {% htmx_target '#image-carousel' %}>
+                                <i data-feather="home"></i> Architecture
+                            </button>
+                        </div>
+                        
+                        <div class="border rounded p-3">
+                            <h6 class="small text-muted mb-2">CAROUSEL SETTINGS</h6>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="auto-play" checked>
+                                <label class="form-check-label small" for="auto-play">Auto-play</label>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input class="form-check-input" type="checkbox" id="show-indicators" checked>
+                                <label class="form-check-label small" for="show-indicators">Show indicators</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="show-controls" checked>
+                                <label class="form-check-label small" for="show-controls">Show controls</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Container (positioned fixed) -->
+<div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+    <!-- Toasts will be dynamically added here -->
+</div>
+
+
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+
+
+<script>
+// Tag selection functionality
+document.addEventListener('change', function(event) {
+    if (event.target.matches('#tags-dropdown input[type="checkbox"]')) {
+        updateSelectedTags();
+    }
+});
+
+function updateSelectedTags() {
+    const checkboxes = document.querySelectorAll('#tags-dropdown input[type="checkbox"]:checked');
+    const selectedTags = Array.from(checkboxes).map(cb => cb.value);
+    const display = document.getElementById('selected-tags-display');
+    
+    if (selectedTags.length === 0) {
+        display.innerHTML = '';
+        document.getElementById('selected-tags').textContent = 'Select tags...';
+    } else {
+        document.getElementById('selected-tags').textContent = `${selectedTags.length} selected`;
+        display.innerHTML = selectedTags.map(tag => 
+            `<span class="badge bg-primary me-1">${tag}</span>`
+        ).join('');
+    }
+}
+
+// Auto-dismiss toasts
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    if (event.target.id === 'toast-container') {
+        // Auto-dismiss toasts after 5 seconds
+        const toasts = event.target.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+            bsToast.show();
+        });
+    }
+    
+    // Re-initialize Feather icons
+    feather.replace();
+});
+
+// Search dropdown functionality
+document.addEventListener('input', function(event) {
+    if (event.target.matches('input[placeholder*="Search users"]')) {
+        const dropdown = event.target.nextElementSibling;
+        if (event.target.value.length > 0) {
+            dropdown.classList.add('show');
+        }
+    }
+});
+
+// Close search dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    if (!event.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu.show').forEach(menu => {
+            menu.classList.remove('show');
+        });
+    }
+});
+</script>
+
+
+{% bootstrap_javascript %}
+</body>
+</html>
+

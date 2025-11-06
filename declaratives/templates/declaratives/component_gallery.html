@@ -1,0 +1,654 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+     
+      
+      
+      
+      
+      <script type="text/javascript" src="{% static 'htmx/json-enc.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'htmx/loading-states.min.js' %}"></script>
+  <script type="text/javascript" src="{% static 'htmx/sse.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'htmx/ws.min.js' %}"></script>
+
+      <script type="text/javascript" src="{% static 'htmx/preload.min.js' %}"></script>
+      
+      
+      
+      <script type="text/javascript" src="{% static 'htmx/morphdom-swap.min.js' %}"></script>
+      <script type="text/javascript" src="{% static 'htmx/debug.min.js' %}"></script>
+  
+
+  
+  <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/gallery.css' %}" rel="stylesheet" />
+
+
+    <!-- Feather Icons -->
+
+      <script type ="text/javascript" src="{% static 'js/feather.min.js' %}"></script>
+      <script type ="text/javascript" src="{% static 'js/loader.js' %}"></script>
+      <script type ="text/javascript" src="{% static 'js/gallery_start_head.js' %}"></script>
+
+    <!-- HTMX Configuration -->
+    {% htmx_headers %}
+    <!-- {% htmx_config timeout=15000 %} -->
+    
+   
+       
+    
+   
+   
+</head>
+
+<body {% htmx_boost_links %}>
+    {% csrf_token %}
+
+    <div class="container py-4">
+
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="display-4">🧪 HyperX Component Gallery</h1>
+            <p class="lead">Interactive components showcase - Zero JavaScript, Pure Django Magic</p>
+            
+            <!-- Navigation -->
+            <div class="btn-group mt-3" role="group">
+                <a href="{% url 'declaratives:showcase_home' %}" class="btn btn-outline-primary" hx-boost="false">
+                    <i data-feather="home"></i> Showcase Home
+                </a>
+                <button type="button" class="btn btn-success active">
+                    <i data-feather="grid"></i> Component Gallery
+                </button>
+                <a href="{% url 'declaratives:hyperx_playground' %}" class="btn btn-outline-warning" hx-boost="false">
+                    <i data-feather="tool"></i> HyperX Playground
+                </a>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="componentTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tables-tab" data-bs-toggle="tab" 
+                        data-bs-target="#tables" type="button" role="tab">
+                    📊 Tables & Data
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="forms-tab" data-bs-toggle="tab" 
+                        data-bs-target="#forms" type="button" role="tab">
+                    📝 Forms & Input
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="charts-tab" data-bs-toggle="tab" 
+                        data-bs-target="#charts" type="button" role="tab">
+                    📈 Charts & Viz
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="realtime-tab" data-bs-toggle="tab" 
+                        data-bs-target="#realtime" type="button" role="tab">
+                    ⚡ Real-time
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ui-tab" data-bs-toggle="tab" 
+                        data-bs-target="#ui" type="button" role="tab">
+                    🎨 UI Elements
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="files-tab" data-bs-toggle="tab" 
+                        data-bs-target="#files" type="button" role="tab">
+                    📁 File Ops
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="advanced-tab" data-bs-toggle="tab" 
+                        data-bs-target="#advanced" type="button" role="tab">
+                    🚀 Advanced
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="performance-tab" data-bs-toggle="tab" 
+                        data-bs-target="#performance" type="button" role="tab">
+                    🏆 Chart Performance
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Contents -->
+        <div class="tab-content" id="componentTabsContent">
+            
+            <!-- Tables & Data Tab -->
+            <div class="tab-pane show active" id="tables" role="tabpanel">
+                <h4>Data Tables & Pagination</h4>
+                <p class="text-muted mb-4">Interactive tables with sorting, filtering, and pagination using pure HTMX.</p>
+                
+                {% include 'declaratives/components/paginated_table.html' %}
+            </div>
+            
+            <!-- Forms & Input Tab -->
+            <div class="tab-pane" id="forms" role="tabpanel">
+                <h4>Dynamic Forms & Validation</h4>
+                <p class="text-muted mb-4">Real-time form validation, dynamic fields, and interactive input components.</p>
+                
+                {% include 'declaratives/components/dynamic_forms.html' %}
+            </div>
+            
+            <!-- Charts & Visualization Tab -->
+            <div class="tab-pane" id="charts" role="tabpanel">
+                <h4>Charts & Visualization</h4>
+                <p class="text-muted mb-4">Live updating charts and data visualization components.</p>
+                
+                {% include 'declaratives/components/live_charts.html' %}
+            </div>
+            
+            <!-- Real-time & Live Tab -->
+                        <!-- Real-time & Live Tab -->
+            <div class="tab-pane" id="realtime" role="tabpanel">
+                <h4>Real-time Updates & Live Data</h4>
+                <p class="text-muted mb-4">Live streaming data, notifications, and real-time interactions.</p>
+                
+                {% include 'declaratives/components/realtime_features.html' %}
+            </div>
+            
+                        <!-- UI Components Tab -->
+            <div class="tab-pane" id="ui" role="tabpanel">
+                <h4>Interactive UI Components</h4>
+                <p class="text-muted mb-4">Modals, tooltips, collapsibles, and other interactive elements.</p>
+                
+                {% include 'declaratives/components/ui_components.html' %}
+            </div>
+            
+            <!-- File Operations Tab -->
+                        <!-- File & Media Tab -->
+            <div class="tab-pane" id="files" role="tabpanel">
+                <h4>File Uploads & Media Management</h4>
+                <p class="text-muted mb-4">Drag & drop uploads, progress tracking, and media galleries.</p>
+            </div>
+            
+            <!-- Advanced Patterns Tab -->
+            <div class="tab-pane" id="advanced" role="tabpanel">
+                <h4>Advanced Patterns</h4>
+                <p class="text-muted mb-4">Complex interactions, workflows, and advanced HTMX techniques.</p>
+                
+                <!-- Advanced patterns -->
+                <div class="row">
+                    <!-- Infinite Scroll -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Infinite Scroll</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="infinite-scroll-container" style="height: 300px; overflow-y: auto;">
+                                    <div {% htmx_get '/declaratives/component/advanced/infinite-scroll/' %}
+                                         {% htmx_trigger 'load' %}
+                                         hx-target="this"
+                                         {% htmx_swap 'outerHTML' %}>
+                                        <div class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status"></div>
+                                            <div class="mt-2 text-muted">Loading items...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Drag & Drop Sorting -->
+                    <div class="col-lg-6 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Drag & Drop Sorting</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="sortable-list" class="sortable-container">
+                                    <!-- Drag & Drop Items loaded from database -->
+                                    <div class="sortable-item" data-id="1" draggable="true">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-grip-vertical me-3 text-muted" style="cursor: grab;"></i>
+                                            <div class="flex-grow-1">
+                                                <strong>Task 1: Design Homepage</strong>
+                                                <div class="text-muted small">Create wireframes and mockups</div>
+                                            </div>
+                                            <span class="badge bg-primary">High</span>
+                                        </div>
+                                    </div>
+                                    <div class="sortable-item" data-id="2" draggable="true">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-grip-vertical me-3 text-muted" style="cursor: grab;"></i>
+                                            <div class="flex-grow-1">
+                                                <strong>Task 2: Implement Login</strong>
+                                                <div class="text-muted small">Authentication system setup</div>
+                                            </div>
+                                            <span class="badge bg-warning">Medium</span>
+                                        </div>
+                                    </div>
+                                    <div class="sortable-item" data-id="3" draggable="true">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-grip-vertical me-3 text-muted" style="cursor: grab;"></i>
+                                            <div class="flex-grow-1">
+                                                <strong>Task 3: Setup Database</strong>
+                                                <div class="text-muted small">Configure models and migrations</div>
+                                            </div>
+                                            <span class="badge bg-success">Low</span>
+                                        </div>
+                                    </div>
+                                    <div class="sortable-item" data-id="4" draggable="true">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-grip-vertical me-3 text-muted" style="cursor: grab;"></i>
+                                            <div class="flex-grow-1">
+                                                <strong>Task 4: Deploy to Production</strong>
+                                                <div class="text-muted small">Server configuration and deployment</div>
+                                            </div>
+                                            <span class="badge bg-danger">Critical</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Multi-step Wizard -->
+                    <div class="col-12 mb-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Multi-step Wizard</h6>
+                            </div>
+                            <div class="card-body">
+                                <div id="wizard-container"
+                                     {% htmx_get '/declaratives/component/advanced/wizard/' %}
+                                     {% htmx_trigger 'load' %}
+                                     {% htmx_swap 'innerHTML' %}>
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status"></div>
+                                        <div class="mt-2 text-muted">Loading wizard...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                        <div class="demo-card">
+                            <h4 class="component-title">🔍 Smart Autocomplete</h4>
+                            <p>Search with intelligent suggestions</p>
+                            
+                            <div class="autocomplete-container">
+                                <input type="text" 
+                                       class="form-control" 
+                                       placeholder="Search tasks, users..."
+                                       hx-get="/declaratives/components/autocomplete/"
+                                       hx-trigger="keyup changed delay:300ms"
+                                       hx-target="#autocomplete-results"
+                                       hx-include="this">
+                                
+                                <div id="autocomplete-results" class="autocomplete-results">
+                                    <!-- Results will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="row">
+                    
+                    <!-- Dynamic Form Fields -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">🔄 Dynamic Form Fields</h4>
+                            <p>Form fields that change based on selection</p>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Field Type</label>
+                                <select class="form-control"
+                                        hx-get="/declaratives/components/dynamic-fields/"
+                                        hx-target="#dynamic-field-container"
+                                        hx-include="this"
+                                        name="type">
+                                    <option value="text">Text</option>
+                                    <option value="number">Number</option>
+                                    <option value="email">Email</option>
+                                    <option value="select">Select</option>
+                                    <option value="date">Date</option>
+                                    <option value="textarea">Textarea</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Value</label>
+                                <div id="dynamic-field-container">
+                                    <input type="text" class="form-control" name="value" placeholder="Enter text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">📁 File Upload</h4>
+                            <p>Drag & drop file upload with progress</p>
+                            
+                            <form hx-post="/declaratives/components/file-upload/"
+                                  hx-target="#upload-result"
+                                  hx-encoding="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="upload-area">
+                                    <input type="file" name="file" class="form-control mb-3">
+                                    <p>Choose a file or drag it here</p>
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="htmx-indicator spinner-border spinner-border-sm me-2"></span>
+                                        Upload File
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div id="upload-result" class="mt-3">
+                                <!-- Upload results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Interactions Tab -->
+            <div class="tab-pane" id="interactions" role="tabpanel">
+                <div class="row">
+                    
+                    <!-- Drag & Drop Reordering -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">🎯 Drag & Drop Reorder</h4>
+                            <p>Reorder items by dragging them</p>
+                            
+                            <div id="sortable-list">
+                                <div class="sortable-item" data-id="1">
+                                    <strong>📋 Task 1:</strong> Review project requirements
+                                </div>
+                                <div class="sortable-item" data-id="2">
+                                    <strong>🎨 Task 2:</strong> Design user interface
+                                </div>
+                                <div class="sortable-item" data-id="3">
+                                    <strong>💻 Task 3:</strong> Implement backend logic
+                                </div>
+                                <div class="sortable-item" data-id="4">
+                                    <strong>🧪 Task 4:</strong> Write unit tests
+                                </div>
+                            </div>
+                            
+                            <div id="reorder-result" class="mt-3">
+                                <!-- Reorder results will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Dialogs -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">💬 Modal Dialogs</h4>
+                            <p>Dynamic modals with HTMX content</p>
+                            
+                            <button class="btn btn-primary me-2"
+                                    hx-get="/declaratives/components/modal/confirm/"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML">
+                                Confirmation Modal
+                            </button>
+                            
+                            <button class="btn btn-success me-2"
+                                    hx-get="/declaratives/components/modal/form/"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML">
+                                Form Modal
+                            </button>
+                            
+                            <button class="btn btn-info"
+                                    hx-get="/declaratives/components/modal/gallery/"
+                                    hx-target="#modal-container"
+                                    hx-swap="innerHTML">
+                                Gallery Modal
+                            </button>
+                            
+                            <div id="modal-container">
+                                <!-- Modals will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Real-time Tab -->
+            <div class="tab-pane" id="realtime" role="tabpanel">
+                <div class="row">
+                    
+                    <!-- Live Chat -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">💬 Live Chat</h4>
+                            <p>Real-time chat with auto-responses</p>
+                            
+                            <div class="chat-container">
+                                <div class="chat-messages" id="chat-messages">
+                                    <div class="chat-message bot-message">
+                                        <strong>Bot:</strong> Hello! Send a message to get started.
+                                        <small class="text-muted">{{ "now"|date:"H:i" }}</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-2 border-top">
+                                    <form hx-post="/declaratives/components/chat/"
+                                          hx-target="#chat-messages"
+                                          hx-swap="beforeend"
+                                          class="d-flex">
+                                        {% csrf_token %}
+                                        <input type="text" name="message" class="form-control me-2" 
+                                               placeholder="Type a message..." required>
+                                        <button type="submit" class="btn btn-primary">Send</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Notifications -->
+                    <div class="col-md-6 mb-4">
+                        <div class="demo-card">
+                            <h4 class="component-title">🔔 Live Notifications</h4>
+                            <p>Real-time notification system</p>
+                            
+                            <button class="btn btn-primary mb-3"
+                                    hx-get="/declaratives/components/notifications/"
+                                    hx-target="#notifications-container"
+                                    hx-swap="afterbegin">
+                                Trigger Notification
+                            </button>
+                            
+                            <div id="notifications-container"
+                                 {% htmx_polling "/declaratives/components/notifications/" "5s" %}>
+                                <!-- Notifications will appear here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Advanced Tab -->
+            <div class="tab-pane" id="advanced" role="tabpanel">
+                <div class="row">
+                    
+                    <!-- Coming Soon -->
+                    <div class="col-12">
+                        <div class="demo-card text-center">
+                            <h4 class="component-title">🚀 Advanced Components</h4>
+                            <p class="lead">More advanced components coming soon!</p>
+                            
+                            <div class="row mt-4">
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h1>📊</h1>
+                                            <h6>Live Charts</h6>
+                                            <small class="text-muted">Real-time data visualization</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h1>🌐</h1>
+                                            <h6>WebSocket Integration</h6>
+                                            <small class="text-muted">Bidirectional communication</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h1>🎮</h1>
+                                            <h6>Interactive Games</h6>
+                                            <small class="text-muted">Real-time multiplayer games</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 mb-3">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <h1>🤖</h1>
+                                            <h6>AI Integration</h6>
+                                            <small class="text-muted">AI-powered interactions</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- Chart Performance Tab -->
+            <div class="tab-pane" id="performance" role="tabpanel">
+                <div id="chart-performance-content"
+                     {% htmx_get '/declaratives/components/chart-performance/' %}
+                     {% htmx_trigger 'load' %}
+                     hx-target="this"
+                     {% htmx_swap 'innerHTML' %}>
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading performance dashboard...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Loading Chart Performance Testing...</div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted">
+                🧪 <strong>HyperX Component Gallery</strong> - Proving Django can do anything React can do, better!
+            </p>
+        </div>
+    </div>
+
+    
+        
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+    
+    <!-- Bootstrap Modal Container for UI Components -->
+    <div class="modal fade" id="componentModal" tabindex="-1" aria-labelledby="componentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="modal-container">
+                <!-- Modal content will be loaded here via HTMX -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Loading...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container (positioned fixed) -->
+    <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+    
+
+    
+    
+    <!-- Initialize Feather Icons -->
+    <script>
+        // Initialize Feather icons on page load
+        feather.replace();
+        
+        // Re-initialize Feather icons after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            feather.replace();
+        });
+        
+        // Auto-dismiss Bootstrap toasts
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            if (event.target.id === 'toast-container') {
+                const toasts = event.target.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+                    bsToast.show();
+                });
+            }
+        });
+        
+        // File upload drag and drop
+        document.getElementById('file-upload-area')?.addEventListener('click', function() {
+            document.getElementById('file-input').click();
+        });
+        
+        document.getElementById('file-input')?.addEventListener('change', function(event) {
+            if (event.target.files.length > 0) {
+                // Trigger HTMX file upload
+                htmx.trigger(document.getElementById('file-upload-area'), 'htmx:trigger');
+            }
+        });
+    </script>
+    
+    {% htmx_debug %}
+
+{% bootstrap_javascript %}
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,212 @@
+{% load static %}
+{% load htmx_tags %}
+
+<!-- Table rows for paginated tasks -->
+<div class="table-responsive">
+    <table class="table table-hover mb-0">
+        <thead class="bg-light">
+            <tr>
+                <th>
+                    <a href="#" class="text-decoration-none"
+                       {% htmx_get '/declaratives/component/table/data/' %}
+                       hx-target="#table-container"
+                       {% htmx_params 'sort=title&order=' %}{% if sort == 'title' and order == 'asc' %}desc{% else %}asc{% endif %}>
+                        Title
+                        {% if sort == 'title' %}
+                            <i data-feather="chevron-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="#" class="text-decoration-none"
+                       {% htmx_get '/declaratives/component/table/data/' %}
+                       hx-target="#table-container"
+                       {% htmx_params 'sort=priority&order=' %}{% if sort == 'priority' and order == 'asc' %}desc{% else %}asc{% endif %}>
+                        Priority
+                        {% if sort == 'priority' %}
+                            <i data-feather="chevron-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="#" class="text-decoration-none"
+                       {% htmx_get '/declaratives/component/table/data/' %}
+                       hx-target="#table-container"
+                       {% htmx_params 'sort=created_by__username&order=' %}{% if sort == 'created_by__username' and order == 'asc' %}desc{% else %}asc{% endif %}>
+                        Created By
+                        {% if sort == 'created_by__username' %}
+                            <i data-feather="chevron-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>
+                        {% endif %}
+                    </a>
+                </th>
+                <th>
+                    <a href="#" class="text-decoration-none"
+                       {% htmx_get '/declaratives/component/table/data/' %}
+                       hx-target="#table-container"
+                       {% htmx_params 'sort=created_at&order=' %}{% if sort == 'created_at' and order == 'asc' %}desc{% else %}asc{% endif %}>
+                        Created
+                        {% if sort == 'created_at' %}
+                            <i data-feather="chevron-{% if order == 'asc' %}up{% else %}down{% endif %}"></i>
+                        {% endif %}
+                    </a>
+                </th>
+                <th>Status</th>
+                <th width="120">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in tasks %}
+            <tr>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            {% if task.completed %}
+                                <i data-feather="check-circle" class="text-success"></i>
+                            {% else %}
+                                <i data-feather="circle" class="text-muted"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="fw-medium{% if task.completed %} text-decoration-line-through text-muted{% endif %}">
+                                {{ task.title }}
+                            </div>
+                            {% if task.description %}
+                                <small class="text-muted">{{ task.description|truncatechars:50 }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if task.priority == 'high' %}
+                        <span class="badge bg-danger">High</span>
+                    {% elif task.priority == 'medium' %}
+                        <span class="badge bg-warning">Medium</span>
+                    {% else %}
+                        <span class="badge bg-info">Low</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-sm me-2">
+                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 32px; height: 32px;">
+                                <small class="text-white fw-bold">{{ task.created_by.username|slice:":1"|upper }}</small>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="fw-medium">{{ task.created_by.username }}</div>
+                            <small class="text-muted">{{ task.created_by.get_full_name|default:"No name set" }}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div>{{ task.created_at|date:"M d, Y" }}</div>
+                    <small class="text-muted">{{ task.created_at|timesince }} ago</small>
+                </td>
+                <td>
+                    {% if task.completed %}
+                        <span class="badge bg-success">Completed</span>
+                    {% else %}
+                        <span class="badge bg-warning">Pending</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary"
+                                {% htmx_get '/declaratives/component/modal/content/' %}
+                                {% htmx_params 'type=task_edit&task_id=' %}{{ task.id }}
+                                hx-target="#modal-container"
+                                data-bs-toggle="modal" data-bs-target="#componentModal">
+                            <i data-feather="edit-2"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-success"
+                                {% htmx_post '/declaratives/component/tasks/' %}{{ task.id }}/toggle/'
+                                hx-target="closest tr"
+                                {% htmx_swap 'outerHTML' %}>
+                            <i data-feather="{% if task.completed %}x-circle{% else %}check{% endif %}"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-danger"
+                                {% htmx_delete_confirm "/declaratives/component/tasks/"|add:task.id|add:"/delete/" "closest tr" "Are you sure you want to delete task '"|add:task.title|add:"'?" %}>
+                            <i data-feather="trash-2"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center py-4 text-muted">
+                    <i data-feather="clipboard" class="mb-2"></i>
+                    <div>No tasks found</div>
+                    {% if search %}
+                        <small>Try adjusting your search criteria</small>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% if tasks.has_other_pages %}
+<div class="card-footer">
+    <nav aria-label="Table pagination">
+        <div class="d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+                Showing {{ tasks.start_index }}–{{ tasks.end_index }} of {{ tasks.paginator.count }} tasks
+            </small>
+            
+            <ul class="pagination pagination-sm mb-0">
+                {% if tasks.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="#"
+                           {% htmx_get '/declaratives/component/table/data/' %}
+                           {% htmx_params 'page=' %}{{ tasks.previous_page_number }}
+                           hx-target="#table-container">
+                            <i data-feather="chevron-left"></i>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for page_num in tasks.paginator.page_range %}
+                    {% if page_num == tasks.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                    {% elif page_num == 1 or page_num == tasks.paginator.num_pages or page_num|add:"-2" <= tasks.number <= page_num|add:"2" %}
+                        <li class="page-item">
+                            <a class="page-link" href="#"
+                               {% htmx_get '/declaratives/component/table/data/' %}
+                               {% htmx_params 'page=' %}{{ page_num }}
+                               hx-target="#table-container">
+                                {{ page_num }}
+                            </a>
+                        </li>
+                    {% elif page_num|add:"-3" == tasks.number or page_num|add:"3" == tasks.number %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if tasks.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="#"
+                           {% htmx_get '/declaratives/component/table/data/' %}
+                           {% htmx_params 'page=' %}{{ tasks.next_page_number }}
+                           hx-target="#table-container">
+                            <i data-feather="chevron-right"></i>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+</div>
+{% endif %}
+
+<script>
+    // Reinitialize Feather icons after HTMX swap
+    if (typeof feather !== 'undefined') {
+        feather.replace();
+    }
+</script>

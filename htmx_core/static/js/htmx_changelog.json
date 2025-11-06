@@ -1,0 +1,51 @@
+{
+  "library": "htmx",
+  "version_major": "2.x",
+  "released": "2024-06 (v2.0.0)",
+  "key_changes": [
+    {
+      "area": "Extension architecture",
+      "change": "Core extensions (e.g., SSE, WebSocket) are moved out of the core repository into their own packages.",
+      "impact": "If you were using hx-sse or hx-ws attributes, you must update to use the new extension modules. :contentReference[oaicite:1]{index=1}"
+    },
+    {
+      "area": "Deprecated attributes",
+      "change": "The deprecated attributes hx-sse and hx-ws have been removed in favour of extension-based implementations.",
+      "impact": "Code relying on those attributes must be updated to the new extension syntax. :contentReference[oaicite:2]{index=2}"
+    },
+    {
+      "area": "HTTP standards",
+      "change": "DELETE requests now use URL parameters instead of form-encoded bodies to align with spec.",
+      "impact": "If you used hx-delete with a request body, you may need to update to query-param style. :contentReference[oaicite:3]{index=3}"
+    },
+    {
+      "area": "Browser support",
+      "change": "Support for Internet Explorer is dropped in 2.x.",
+      "impact": "If you still support IE, stay on 1.x or provide fallback. :contentReference[oaicite:4]{index=4}"
+    },
+    {
+      "area": "Module formats",
+      "change": "HTMX provides multiple module formats (ESM, AMD, CJS) in /dist. The browser-loadable htmx.js remains.",
+      "impact": "Offers better bundler and module support. :contentReference[oaicite:5]{index=5}"
+    },
+    {
+      "area": "Web Components / Shadow DOM",
+      "change": "Improved support for Shadow DOM and Web Components in 2.x.",
+      "impact": "If you use custom elements or web components, this version works better. :contentReference[oaicite:6]{index=6}"
+    }
+  ],
+  "migration_notes": [
+    "Ensure you update extension URLs when moving to 2.x (extensions.htmx.org).",
+    "Search your code for hx-sse, hx-ws and replace with installation of proper extension modules.",
+    "Review hx-delete usage to confirm no request body is used where spec now expects query parameters.",
+    "Check browser support requirements (IE-11 and older no longer supported).",
+    "Test your HTMX triggers, swap behaviours and custom extensions after upgrade."
+  ],
+  "focus_for_learning": [
+    "hx-get, hx-post, hx-put, hx-patch, hx-delete – core request methods",
+    "hx-target, hx-swap, hx-trigger – how you control insertion and event timing",
+    "hx-ext – how you load and enable extensions (json-enc, ws, sse etc.)",
+    "Out-of-band swap (hx-swap-oob) and response headers (HX-Redirect, HX-Trigger)",
+    "htmx events (htmx:beforeRequest, htmx:afterSwap etc.) for custom logic"
+  ]
+}

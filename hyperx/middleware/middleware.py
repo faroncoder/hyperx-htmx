@@ -8,13 +8,16 @@ https://github.com/faroncoder/hyperx-htmx
 """
 
 import re, time, asyncio, logging
+from urllib import response
 from django.http import HttpResponseBadRequest
 from django.utils.deprecation import MiddlewareMixin
 from django.middleware.csrf import get_token
 from django.utils.html import escape
 # from hyperx.core.hx.hx_core import *
-from hyperx.core.hx.hx_runtime_compiler import *
-from hyperx.bin.cli.logger.hx_logger import *
+from hyperx.hx.hx_runtime_compiler import HyperXCompiler
+from hyperx.logger.hx_logger import *
+from hyperx.loader.hx_loader import *
+
 
 # Import validate_htmx_request if available, or define a stub
 try:
@@ -26,13 +29,13 @@ except ImportError:
         return True
 
 _logger = load_logger("hyperx.middleware.middleware")
-_logger_middleware = load_logger("hyperx.core.htmx_implementation.middleware")
-_logger_security = load_logger("hyperx.core.htmx_implementation.security")
-_logger_performance = load_logger("hyperx.core.htmx_implementation.performance")
+_logger.info("hyperx.middleware initialized")
+_logger_middleware = load_logger("hyperx.htmx_implementation.middleware")
+_logger_security = load_logger("hyperx.htmx_implementation.security")
+_logger_performance = load_logger("hyperx.htmx_implementation.performance")
 
-from hyperx.bin.cli.utils.autodiscover import autodiscover
 
-autodiscover('hyperx.templatetags.htmx_tags')  # ensure tags are loaded
+
 
 # Define a stub for parse_xtab_header if not imported elsewhere
 def parse_xtab_header(request):
@@ -130,28 +133,34 @@ class HyperXMiddleware(MiddlewareMixin):
             response["X-HyperX-Duration"] = f"{duration:.3f}s"
 
         # auto CSRF <meta> injection (safe for GET/HEAD)
+                # auto CSRF <meta> injection (safe for GET/HEAD)
         try:
-            if request.method in ("GET", "HEAD") and "text/html" in response.get("Content-Type", ""):
+            if (
+                request.method in ("GET", "HEAD")
+                and hasattr(response, "content")
+                and "text/html" in response.get("Content-Type", "")
+            ):
                 html = response.content.decode("utf-8")
                 if not re.search(r'<meta\s+name=["\']csrf-token["\']', html, re.I):
                     token = get_token(request)
                     if token:
                         safe = escape(token)
                         snippet = f"""
-<meta name="csrf-token" content="{safe}">
-<script>
-  document.body.dataset.csrf = "{safe}";
-  if (window.htmx) {{
-      htmx.config.headers["X-CSRFToken"] = "{safe}";
-  }}
-</script>
-"""
+        <meta name="csrf-token" content="{safe}">
+        <script>
+        document.body.dataset.csrf = "{safe}";
+        if (window.htmx) {{
+            htmx.config.headers["X-CSRFToken"] = "{safe}";
+        }}
+        </script>
+        """
                         html = re.sub(r"</head>", snippet + "</head>", html, flags=re.I)
                         response.content = html.encode("utf-8")
+                        response["X-HyperX-Version"] = "3.3.0"
                         _logger.info("[HyperX] Auto-inserted CSRF meta/script.")
         except Exception as e:
             _logger.error(f"[HyperX] CSRF injection failed: {e}", exc_info=True)
-
+        
         return response
 
     # ------------------------------------------------------------
@@ -162,6 +171,12 @@ class HyperXMiddleware(MiddlewareMixin):
             request.headers.get("HX-Request") == "true"
             or request.headers.get("X-Requested-With") == "XMLHttpRequest"
         )
+
+
+    def _check_rate_limit(self, request):
+        # TODO: integrate Redis cache or in-memory counter keyed by IP/user
+        return True
+
 
     def _parse_xtab_header(self, request):
         try:

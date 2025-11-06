@@ -1,0 +1,8 @@
+recursive-include static *
+recursive-include elements *.py
+recursive-include hx *.py
+recursive-include logger *.py
+recursive-include loader *.py
+recursive-include bootstrap *.py
+recursive-include templatetags *.py
+

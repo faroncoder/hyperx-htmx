@@ -1,0 +1,569 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %}
+{% bootstrap_css %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HyperX Declaratives Showcase</title>
+
+    <!-- HTMX Configuration -->
+    {% htmx_headers %}
+    {% htmx_config timeout=15000 defaultSwapDelay=100 %}
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/default.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/simple_datatable.css' %}">
+    
+    <!-- JavaScript Files -->
+    <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/json_enc.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/ws.js' %}"></script>
+    
+    <!-- HTMX Configuration with default target -->
+   
+    
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .task-row {
+            transition: all 0.3s ease;
+        }
+        
+        .task-completed {
+            opacity: 0.7;
+            text-decoration: line-through;
+        }
+        
+        /* Enhanced HTMX Loader Styles */
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        
+        /* Full Screen Overlay Loader */
+        .htmx-overlay-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(2px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .htmx-overlay-loader.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .htmx-overlay-loader .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        .htmx-overlay-loader .loading-text {
+            font-size: 1.1rem;
+            color: #495057;
+            font-weight: 500;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Inline loader improvements */
+        .htmx-indicator.spinner-border {
+            color: #007bff;
+        }
+        
+        /* Content area loader */
+        .content-loading {
+            position: relative;
+        }
+        
+        .content-loading::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 10;
+            border-radius: 8px;
+        }
+        
+        .content-loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            margin: -15px 0 0 -15px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            z-index: 11;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .demo-section {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            background: #f8f9fa;
+        }
+        
+        .code-preview {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 1rem;
+        }
+        
+        /* Live metric update animation */
+        .metric-card h3 {
+            transition: all 0.3s ease;
+        }
+        
+        .metric-update {
+            animation: metricPulse 0.6s ease-in-out;
+            color: #28a745 !important;
+            transform: scale(1.05);
+        }
+        
+        @keyframes metricPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #28a745; }
+            100% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+
+<body {% htmx_boost_links %}>
+    <div class="container-fluid py-4">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <h1 class="display-4 text-primary">🎭 HyperX Declaratives</h1>
+                <p class="lead">Django + HTMX + Declarative Templates = ✨ Magic</p>
+                <p class="text-muted">Showcasing server-side reactive components with zero JavaScript</p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="row mb-4">
+            <div class="col-12 text-center">
+                <!-- Keep current page button in group -->
+                <div class="btn-group btn-group-lg me-2" role="group">
+                    <button type="button" class="btn btn-primary active">
+                        <i class="bi bi-house"></i> Showcase Home
+                    </button>
+                </div>
+                
+                <!-- Navigation links as separate buttons -->
+                <a href="{% url 'declaratives:component_gallery' %}" 
+                   class="btn btn-outline-success btn-lg me-1"
+                   hx-boost="false"
+                   onclick="console.log('Component Gallery clicked:', this.href); return true;">
+                    <i class="bi bi-grid-3x3-gap"></i> Component Gallery
+                </a>
+                <a href="{% url 'declaratives:hyperx_playground' %}" 
+                   class="btn btn-outline-warning btn-lg"
+                   hx-boost="false"
+                   onclick="console.log('HyperX Playground clicked:', this.href); return true;">
+                    <i class="bi bi-tools"></i> HyperX Playground
+                </a></div>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        Explore different aspects of the HyperX paradigm
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Loader Demo -->
+        <div class="demo-section">
+            <h2>🔄 Enhanced Loader System</h2>
+            <p>Test the new HyperX loader with different scenarios</p>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <h5>Full Page Loader</h5>
+                    <p>Uses overlay loader for body-targeted requests</p>
+                    <button class="btn btn-primary" 
+                            hx-get="/declaratives/api/slow-response/" 
+                            hx-target="body"
+                            data-loading-overlay="true">
+                        Test Full Page Loader
+                    </button>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Content Area Loader</h5>
+                    <p>Shows loading state for specific targets</p>
+                    <div id="content-area" class="border p-3 mb-2" style="min-height: 100px;">
+                        <p>Content will load here...</p>
+                    </div>
+                    <button class="btn btn-success" 
+                            hx-get="/declaratives/api/sample-content/" 
+                            hx-target="#content-area">
+                        Load Content
+                    </button>
+                </div>
+                
+                <div class="col-md-4">
+                    <h5>Inline Loader</h5>
+                    <p>Traditional spinner indicators</p>
+                    <button class="btn btn-info" 
+                            hx-get="/declaratives/api/quick-data/">
+                        <span class="htmx-indicator spinner-border spinner-border-sm me-2"></span>
+                        Quick Load
+                    </button>
+                    
+                    <div id="quick-results" class="mt-2"></div>
+                </div>
+            </div>
+            
+            <div class="code-preview">
+&lt;!-- Full Page Loader --&gt;
+&lt;button hx-get="/api/slow/" hx-target="body" data-loading-overlay="true"&gt;
+    Full Page Load
+&lt;/button&gt;
+
+&lt;!-- Content Area Loader --&gt;  
+&lt;button hx-get="/api/content/" hx-target="#content-area"&gt;
+    Load Content
+&lt;/button&gt;
+
+&lt;!-- Inline Loader --&gt;
+&lt;button hx-get="/api/quick/"&gt;
+    &lt;span class="htmx-indicator spinner-border spinner-border-sm"&gt;&lt;/span&gt;
+    Quick Load
+&lt;/button&gt;
+            </div>
+        </div>
+
+        <!-- Live Metrics Dashboard -->
+        <div class="demo-section">
+            <h2>📊 Live Metrics Dashboard</h2>
+            <p>Real-time updates using <code>{% verbatim %}{% htmx_polling %}{% endverbatim %}</code></p>
+            
+            <!-- Polling targeting specific metric elements -->
+            <div {% htmx_polling "/declaratives/api/metrics/" "2s" %} style="display: none;"></div>
+            
+            <div class="row" id="metrics-container">
+                <div class="col-md-3">
+                    <div class="metric-card text-center">
+                        <h3 id="total-tasks-count">{{ total_tasks }}</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card text-center">
+                        <h3 id="completed-tasks-count">{{ completed_tasks }}</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card text-center">
+                        <h3 id="users-online-count">{{ request.user.is_authenticated|yesno:"1,0" }}</h3>
+                        <p>Users Online</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="metric-card text-center">
+                        <h3 id="last-update-time">--:--:--</h3>
+                        <p>Last Update</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+            
+            <div class="code-preview">
+{% verbatim %}&lt;div {% htmx_polling "/api/metrics/" "2s" "#metrics" %}&gt;
+    &lt;!-- Content updates every 2 seconds --&gt;
+&lt;/div&gt;{% endverbatim %}
+            </div>
+        </div>
+
+        <!-- Live Search -->
+        <div class="demo-section">
+            <h2>🔍 Live Search</h2>
+            <p>Instant search with <code>{% verbatim %}{% htmx_trigger %}{% endverbatim %}</code> and debouncing</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <form>
+                        <div class="input-group mb-3">
+                            <input type="search" 
+                                   name="q" 
+                                   class="form-control" 
+                                   placeholder="Search tasks..."
+                                   hx-get="/declaratives/search/"
+                                   hx-target="#search-results"
+                                   hx-trigger="keyup changed delay:300ms, search"
+                                   hx-indicator="#search-loading">
+                            <div class="input-group-text">
+                                <div id="search-loading" class="htmx-indicator spinner-border spinner-border-sm"></div>
+                            </div>
+                        </div>
+                    </form>
+                    
+                    <div id="search-results" class="border rounded p-3 bg-white">
+                        {% include 'declaratives/partials/task_search_results.html' %}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="code-preview">
+{% verbatim %}&lt;input {% htmx_trigger "keyup changed delay:300ms" "#results" %}
+       {% htmx_lazy_load "/search/" %}&gt;{% endverbatim %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Add Form -->
+        <div class="demo-section">
+            <h2>⚡ Quick Task Creation</h2>
+            <p>Instant form submission with <code>{% verbatim %}{% htmx_form_submit %}{% endverbatim %}</code></p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <form id="quick-add-form" 
+                          hx-post="/declaratives/api/tasks/quick-add/"
+                          hx-target="#task-list"
+                          hx-swap="afterbegin"
+                          hx-indicator="#add-loading">
+                        {% csrf_token %}
+                        <div class="input-group mb-3">
+                            <input type="text" 
+                                   name="title" 
+                                   class="form-control" 
+                                   placeholder="Add a new task..."
+                                   required>
+                            <button class="btn btn-primary" type="submit">
+                                <span id="add-loading" class="htmx-indicator spinner-border spinner-border-sm me-2"></span>
+                                Add Task
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="code-preview">
+{% verbatim %}&lt;form {% htmx_form_submit "#task-list" "afterbegin" %}&gt;
+    {% htmx_csrf_headers request %}
+    &lt;!-- Instant submission, no page reload --&gt;
+&lt;/form&gt;{% endverbatim %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interactive Task List -->
+        <div class="demo-section">
+            <h2>📝 Interactive Task List</h2>
+            <p>Toggle states and delete with <code>{% verbatim %}{% htmx_delete_confirm %}{% endverbatim %}</code></p>
+            
+            {% if not request.user.is_authenticated %}
+                <div class="alert alert-info">
+                    <strong>Demo Mode:</strong> Please log in to see interactive features.
+                </div>
+            {% endif %}
+            
+            <div id="task-list">
+                {% for task in tasks %}
+                    <div id="task-{{ task.id }}" class="task-row">
+                        {% include 'declaratives/partials/task_row.html' %}
+                    </div>
+                {% empty %}
+                    <div class="text-center text-muted py-4">
+                        <p>No tasks yet. Add one above to get started!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Form Validation Demo -->
+        <div class="demo-section">
+            <h2>✅ Real-time Form Validation</h2>
+            <p>Live validation with <code>{% verbatim %}{% htmx_validate_field %}{% endverbatim %}</code></p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <form>
+                        <div class="mb-3">
+                            <label for="task-title" class="form-label">Task Title</label>
+                            <input type="text" 
+                                   id="task-title"
+                                   name="title"
+                                   class="form-control"
+                                   hx-post="/declaratives/api/validate/task-title/"
+                                   hx-target="#title-validation"
+                                   hx-trigger="keyup changed delay:500ms"
+                                   hx-indicator="#validation-loading">
+                            <div id="title-validation" class="mt-2">
+                                <span id="validation-loading" class="htmx-indicator">Validating...</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="code-preview">
+{% verbatim %}&lt;input {% htmx_validate_field "title" "/validate/" %}&gt;
+&lt;!-- Real-time validation feedback --&gt;{% endverbatim %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lazy Loading Demo -->
+        <div class="demo-section">
+            <h2>🐌 Lazy Loading</h2>
+            <p>Load content when needed with <code>{% verbatim %}{% htmx_lazy_load %}{% endverbatim %}</code></p>
+            
+            {% if tasks %}
+                {% for task in tasks|slice:":2" %}
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5>{{ task.title }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div hx-get="/declaratives/api/tasks/{{ task.id }}/comments/"
+                                 hx-trigger="revealed"
+                                 hx-indicator="#comments-loading-{{ task.id }}">
+                                <div id="comments-loading-{{ task.id }}" class="text-center py-3">
+                                    <div class="spinner-border spinner-border-sm me-2"></div>
+                                    Loading comments...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="code-preview">
+{% verbatim %}&lt;div {% htmx_lazy_load "/comments/" "revealed" %}&gt;
+    &lt;!-- Loads when scrolled into view --&gt;
+&lt;/div&gt;{% endverbatim %}
+            </div>
+        </div>
+
+        <!-- WebSocket Demo Preview -->
+        <div class="demo-section">
+            <h2>🌐 WebSocket Integration</h2>
+            <p>Real-time communication with <code>{% verbatim %}{% htmx_websocket %}{% endverbatim %}</code></p>
+            
+            <div class="alert alert-info">
+                <strong>Coming Soon:</strong> WebSocket integration for real-time updates.
+                <a href="{% url 'declaratives:websocket_demo' %}" class="btn btn-sm btn-outline-primary ms-2">
+                    View Demo →
+                </a>
+            </div>
+            
+            <div class="code-preview">
+{% verbatim %}&lt;div {% htmx_websocket "/ws/live-updates/" %}&gt;
+    &lt;!-- Real-time WebSocket updates --&gt;
+&lt;/div&gt;{% endverbatim %}
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-5 pt-4 border-top">
+            <p class="text-muted">
+                ✨ <strong>HyperX Declaratives</strong> - Making Django reactive, one template tag at a time.
+            </p>
+            <p class="small text-muted">
+                Built with Django {{ django_version|default:"5.2+" }} + HTMX Core + Template Magic
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+    
+    <script>
+        // Add visual feedback when metrics update
+        document.addEventListener('htmx:afterSwap', function(evt) {
+            // Check if the swapped element is a metric
+            if (evt.detail.target.id && evt.detail.target.id.includes('count') || evt.detail.target.id.includes('time')) {
+                evt.detail.target.classList.add('metric-update');
+                
+                // Remove the animation class after animation completes
+                setTimeout(() => {
+                    evt.detail.target.classList.remove('metric-update');
+                }, 600);
+            }
+        });
+        
+        // Show live connection status
+        document.addEventListener('htmx:beforeRequest', function(evt) {
+            if (evt.detail.requestConfig.path.includes('metrics')) {
+                console.log('🔄 Updating live metrics...');
+            }
+        });
+    </script>
+    
+    {% htmx_debug %}
+
+
+{% bootstrap_javascript %}
+</body>
+</html>

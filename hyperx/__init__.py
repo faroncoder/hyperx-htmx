@@ -1,36 +1,49 @@
 """
-HyperX package initializer (auto-generated)
-────────────────────────────────────────────
-Updated: 2025-10-12T23:15:35.869621
-Do not edit manually; use bin/cli/generator/update_init.py
+HyperX Package
+Framework-agnostic declarative core with optional Django integration.
 """
 
-from __future__ import annotations
-import sys, importlib, logging
+from importlib import import_module
 from pathlib import Path
 
-__version__ = "3.0.0"
+__version__ = "3.3.0"
 __author__ = "Faroncoder"
-__email__ = "jeff.panasuik@gmail.com"
 __license__ = "MIT"
-__url__ = "https://github.com/faroncoder/hyperx-htmx"
 
-from hyperx.middleware import *
-
-ELEMENTS_REGISTERED = False
-AI_TOOLS_AVAILABLE = False
-WATCHER_AVAILABLE = False
+# Core registry containers
+ELEMENT_REGISTRY = {}
+_LOGGER = None
 
 
-_logger = logging.getLogger("hyperx")
-if not _logger.handlers:
-    handler = logging.StreamHandler()
-    handler.setFormatter(logging.Formatter("[%(levelname)s] %(message)s"))
-    _logger.addHandler(handler)
-    _logger.setLevel(logging.INFO)
+def get_static_path() -> Path:
+    """Return the absolute path to bundled static assets."""
+    return Path(__file__).parent / "static" / "hxjs"
 
-_logger.info(f"✅ HyperX {__version__} initialized")
-_logger.info(f"   🧩 Elements Registered: {ELEMENTS_REGISTERED}")
-_logger.info(f"   🧠 AI Tools: {AI_TOOLS_AVAILABLE}")
-_logger.info(f"   👁️ Watcher: {WATCHER_AVAILABLE}")
 
+def init_logger():
+    """Lazy initialize the internal logger."""
+    global _LOGGER
+    if _LOGGER is None:
+        from hyperx.logger.hx_logger import get_logger
+        _LOGGER = get_logger("hyperx")
+    return _LOGGER
+
+
+def load_elements():
+    """Dynamically import all elements under hyperx/elements/."""
+    base = Path(__file__).parent / "elements"
+    for f in base.glob("*.py"):
+        if f.name.startswith("__"):
+            continue
+        import_module(f"hyperx.elements.{f.stem}")
+    return True
+
+
+def boot(debug: bool = False):
+    """Initialize HyperX runtime (logger + elements)."""
+    log = init_logger()
+    log.info(f"[HyperX] Booting package version {__version__}")
+    load_elements()
+    if debug:
+        log.debug(f"[HyperX] Static assets at: {get_static_path()}")
+    return True

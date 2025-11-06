@@ -1,0 +1,71 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/json_enc.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/ws.js' %}"></script>
+  
+  <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+
+    <!-- Feather Icons -->
+
+      <script type ="text/javascript" src="{% static 'js/feather.min.js' %}"></script>
+        <script type ="text/javascript" src="{% static 'js/loader.js' %}"></script>
+
+</head>
+<body>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="metric-card text-center">
+            <h3 id="task-count">{{ metrics.total_tasks }}</h3>
+            <p>Total Tasks</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card text-center">
+            <h3>{{ metrics.completed_tasks }}</h3>
+            <p>Completed</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card text-center">
+            <h3>{{ metrics.users_online }}</h3>
+            <p>Users Online</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="metric-card text-center">
+            <h3><span id="live-time">{{ metrics.last_update }}</span></h3>
+            <p>Last Update</p>
+        </div>
+    </div>
+</div>
+
+
+
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+
+
+
+{% bootstrap_javascript %}
+</body>
+</html>

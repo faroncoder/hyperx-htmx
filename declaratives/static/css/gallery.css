@@ -1,0 +1,266 @@
+     /* 🚀 NO FADE TRANSITIONS - INSTANT HYPERX SPEED! */
+        .tab-pane {
+            transition: none !important;
+            animation: none !important;
+        }
+        
+        .fade {
+            transition: none !important;
+            opacity: 1 !important;
+        }
+        
+        /* Disable Bootstrap modal fade effects too */
+        .modal.fade .modal-dialog {
+            transition: none !important;
+            transform: none !important;
+        }
+        
+        .component-section {
+            min-height: 500px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .component-title {
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .htmx-indicator {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+        
+        /* Paginated Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .table th:hover {
+            background: #e9ecef;
+        }
+        
+        /* Infinite Scroll Styles */
+        .scroll-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .scroll-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+        
+        .scroll-item:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Multi-step Form */
+        .form-step {
+            background: white;
+            border-radius: 8px;
+            padding: 2rem;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 1rem;
+            background: #e9ecef;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        
+        .step.active {
+            background: #007bff;
+            color: white;
+        }
+        
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+        
+        /* Autocomplete */
+        .autocomplete-container {
+            position: relative;
+        }
+        
+        .autocomplete-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        
+        .autocomplete-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .autocomplete-item:hover {
+            background: #f8f9fa;
+        }
+        
+        /* File Upload */
+        .upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #007bff;
+        }
+        
+        /* Chat */
+        .chat-container {
+            height: 300px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f8f9fa;
+        }
+        
+        .chat-message {
+            margin-bottom: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: 2rem;
+        }
+        
+        .bot-message {
+            background: white;
+            margin-right: 2rem;
+        }
+        
+        /* Notifications */
+        .notification-item {
+            background: white;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0 8px 8px 0;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification-item.type-success { border-left-color: #28a745; }
+        .notification-item.type-warning { border-left-color: #ffc107; }
+        .notification-item.type-danger { border-left-color: #dc3545; }
+        
+        /* Enhanced Drag and Drop Styling - NO TRANSITIONS FOR SPEED! */
+        .sortable-container {
+            min-height: 200px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .sortable-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            cursor: move;
+            user-select: none;
+            transition: none !important;
+            position: relative;
+        }
+        
+        .sortable-item:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+        
+        .sortable-item.dragging {
+            opacity: 0.5;
+            background: #e3f2fd;
+            z-index: 1000;
+        }
+        
+        .sortable-item .fas {
+            cursor: grab;
+            color: #6c757d;
+        }
+        
+        .sortable-item .fas:active {
+            cursor: grabbing;
+        }
+        
+        .drag-placeholder {
+            background: #007bff20;
+            border: 2px dashed #007bff;
+            border-radius: 6px;
+            height: 60px;
+            margin-bottom: 10px;
+        }
+     
+ 

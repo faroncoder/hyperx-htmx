@@ -1,0 +1,346 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/json_enc.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/ws.js' %}"></script>
+  
+  <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+
+    <!-- Feather Icons -->
+
+      <script type ="text/javascript" src="{% static 'js/feather.min.js' %}"></script>
+        <script type ="text/javascript" src="{% static 'js/loader.js' %}"></script>
+
+</head>
+<body>
+<!-- Live Charts Component -->
+<div class="row">
+    <!-- Real-time Line Chart -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">System Performance</h5>
+                    <small class="text-muted">Real-time CPU & Memory usage</small>
+                </div>
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="chart-auto-refresh" checked
+                           onchange="toggleChartRefresh(this.checked)">
+                    <label class="form-check-label" for="chart-auto-refresh">
+                        Auto-refresh
+                    </label>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="performance-chart"
+                     {% htmx_get '/declaratives/component/charts/performance/' %}
+                     {% htmx_trigger 'load, every 2s[chart-auto-refresh.checked]' %}
+                     {% htmx_swap 'innerHTML' %}>
+                    <!-- Chart will be rendered here -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading chart...</span>
+                        </div>
+                        <div class="mt-2 text-muted">Loading performance data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dynamic Bar Chart -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Sales by Region</h5>
+                <small class="text-muted">Interactive data visualization</small>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <select class="form-select form-select-sm"
+                                {% htmx_get '/declaratives/component/charts/sales/' %}
+                                {% htmx_trigger 'change' %}
+                                {% htmx_target '#sales-chart' %}
+                                name="period">
+                            <option value="week">This Week</option>
+                            <option value="month" selected>This Month</option>
+                            <option value="quarter">This Quarter</option>
+                            <option value="year">This Year</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select form-select-sm"
+                                {% htmx_get '/declaratives/component/charts/sales/' %}
+                                {% htmx_trigger 'change' %}
+                                {% htmx_target '#sales-chart' %}
+                                name="chart_type">
+                            <option value="bar" selected>Bar Chart</option>
+                            <option value="pie">Pie Chart</option>
+                            <option value="line">Line Chart</option>
+                            <option value="area">Area Chart</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="sales-chart"
+                     {% htmx_get '/declaratives/component/charts/sales/' %}
+                     {% htmx_trigger 'load' %}>
+                    <!-- Chart will be rendered here -->
+                    <div class="text-center py-4">
+                        <div class="placeholder-glow">
+                            <div class="placeholder col-12 mb-2" style="height: 20px;"></div>
+                            <div class="placeholder col-10 mb-2" style="height: 20px;"></div>
+                            <div class="placeholder col-8 mb-2" style="height: 20px;"></div>
+                            <div class="placeholder col-6 mb-2" style="height: 20px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Live Statistics Cards -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Live Statistics Dashboard</h5>
+                <small class="text-muted">Real-time metrics with animated updates</small>
+            </div>
+            <div class="card-body">
+                <div class="row" id="stats-container"
+                     {% htmx_get '/declaratives/component/charts/live-stats/' %}
+                     {% htmx_trigger 'load, every 3s' %}
+                     {% htmx_swap 'innerHTML' %}
+                     hx-indicator="#stats-loading">
+                    
+                    <!-- Statistics cards will be dynamically loaded -->
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <div id="stats-loading" class="htmx-indicator">
+                                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                                </div>
+                                <h2 class="mb-0">---</h2>
+                                <p class="mb-0">Total Users</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h2 class="mb-0">---</h2>
+                                <p class="mb-0">Active Sessions</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h2 class="mb-0">---</h2>
+                                <p class="mb-0">Pending Tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h2 class="mb-0">---</h2>
+                                <p class="mb-0">System Load</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Interactive Chart Controls -->
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Interactive Data Explorer</h5>
+            </div>
+            <div class="card-body">
+                <form class="row g-3 mb-4"
+                      {% htmx_get '/declaratives/component/charts/interactive/' %}
+                      {% htmx_trigger 'change, submit' %}
+                      {% htmx_target '#interactive-chart' %}
+                      {% htmx_prevent_default %}>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Dataset</label>
+                        <select class="form-select" name="dataset">
+                            <option value="revenue">Revenue</option>
+                            <option value="users">User Growth</option>
+                            <option value="orders">Orders</option>
+                            <option value="traffic">Website Traffic</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Time Range</label>
+                        <select class="form-select" name="range">
+                            <option value="7d">Last 7 days</option>
+                            <option value="30d">Last 30 days</option>
+                            <option value="90d">Last 90 days</option>
+                            <option value="1y">Last year</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">Group By</label>
+                        <select class="form-select" name="group_by">
+                            <option value="day">Daily</option>
+                            <option value="week">Weekly</option>
+                            <option value="month">Monthly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="form-label">&nbsp;</label>
+                        <button type="submit" class="btn btn-primary d-block w-100">
+                            <i data-feather="bar-chart-2"></i> Update Chart
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="interactive-chart"
+                     {% htmx_get '/declaratives/component/charts/interactive/' %}
+                     {% htmx_trigger 'load' %}>
+                    <!-- Interactive chart will be rendered here -->
+                    <div class="border rounded p-4 text-center bg-light">
+                        <i data-feather="trending-up" size="48" class="text-muted mb-3"></i>
+                        <h6 class="text-muted">Select parameters above to generate chart</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Legends & Info -->
+    <div class="col-lg-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0">Chart Information</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h6 class="text-primary">Live Updates</h6>
+                    <p class="small text-muted mb-0">
+                        Charts automatically refresh with new data. Toggle auto-refresh 
+                        to control updates manually.
+                    </p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-success">Interactive Controls</h6>
+                    <p class="small text-muted mb-0">
+                        Change parameters to see different views of your data. 
+                        All updates happen without page reload.
+                    </p>
+                </div>
+                
+                <div class="mb-4">
+                    <h6 class="text-warning">Performance Metrics</h6>
+                    <ul class="small text-muted mb-0 ps-3">
+                        <li>Real-time CPU usage</li>
+                        <li>Memory consumption</li>
+                        <li>Network throughput</li>
+                        <li>Disk I/O operations</li>
+                    </ul>
+                </div>
+                
+                <div class="border-top pt-3">
+                    <button class="btn btn-outline-primary btn-sm w-100"
+                            {% htmx_get '/declaratives/component/charts/export-data/' %}
+                            {% htmx_trigger 'click' %}
+                            {% htmx_target '#export-modal' %}
+                            data-bs-toggle="modal" data-bs-target="#exportModal">
+                        <i data-feather="download"></i> Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Chart.js Integration Example -->
+<script>
+// Chart refresh control
+function toggleChartRefresh(enabled) {
+    const chartContainer = document.getElementById('performance-chart');
+    if (enabled) {
+        // Re-enable HTMX polling
+        htmx.process(chartContainer);
+    } else {
+        // This would require custom HTMX extension to truly pause
+        console.log('Auto-refresh toggled:', enabled);
+    }
+}
+
+// Sample Chart.js integration for demonstration
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    // Re-initialize any Chart.js charts after HTMX updates
+    if (event.target.id === 'performance-chart' || event.target.id === 'sales-chart') {
+        // Here you would initialize Chart.js if using it
+        console.log('Chart updated via HTMX');
+    }
+    
+    // Re-initialize Feather icons
+    feather.replace();
+});
+
+// Animate statistics updates
+document.body.addEventListener('htmx:beforeSwap', function(event) {
+    if (event.target.id === 'stats-container') {
+        // Add fade effect before updating statistics
+        event.target.style.opacity = '0.7';
+        setTimeout(() => {
+            event.target.style.opacity = '1';
+        }, 300);
+    }
+});
+</script>
+
+<!-- Export Modal (referenced by export button) -->
+<div class="modal fade" id="exportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" id="export-modal">
+            <!-- Modal content will be loaded via HTMX -->
+        </div>
+    </div>
+</div>
+
+
+
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+
+
+
+{% bootstrap_javascript %}
+</body>
+</html>

@@ -1,0 +1,188 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="HyperX Component Gallery - Showcase of Interactive HTMX Components Built with Django" />
+    <meta name="author" content="S5Portal Team" />        
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'htmx/json-enc.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/loading-states.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/sse.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/ws.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/preload.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/morphdom-swap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'htmx/debug.min.js' %}"></script>
+
+
+    <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+    <link type="text/css" href="{% static 'css/gallery.css' %}" rel="stylesheet" />
+
+
+    <!-- Feather Icons -->
+
+{% comment %}    <script type="text/javascript" src="{% static 'js/feather.min.js' %}"></script> {% endcomment %}
+    <script type="text/javascript" src="{% static 'js/loader.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/gallery_start_head.js' %}"></script>
+
+    <!-- HTMX Configuration -->
+    {% htmx_headers %}
+    <!-- {% htmx_config timeout=15000 %} -->
+
+
+
+
+
+
+</head>
+
+<body>
+
+    <div class="container">
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <!-- Column 1 content -->
+            <!-- Column 3 content -->
+            <div class="p-3 border bg-light"
+            hx-get="{% url 'declaratives:showcase' %}"
+            hx-trigger="click"
+            hx-push-url="false"
+            hx-target="#contentPlaceholder"
+            hx-swap="innerHTML"
+            hx-boost="false"           
+            >Showcase</div>
+
+        </div>
+        <div class="col-md-4">
+            <!-- Column 2 content -->
+            <!-- Column 3 content -->
+            <div class="p-3 border bg-light"
+            hx-get="{% url 'declaratives:component' %}"
+            hx-trigger="click"
+            hx-push-url="false"
+            hx-target="#contentPlaceholder"
+            hx-swap="innerHTML"
+            hx-boost="false"           
+            >Componenets</div>
+        </div>
+        <div class="col-md-4">
+            <!-- Column 3 content -->
+            <div class="p-3 border bg-light"
+            hx-get="{% url 'declaratives:playground' %}"
+            hx-trigger="click"
+            hx-push-url="false"
+            hx-target="#contentPlaceholder"
+            hx-swap="innerHTML"
+            hx-boost="false"           
+            >Playground</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <!-- Full-width row content -->
+            <div id="contentPlaceholder" class="p-3 border bg-white">
+
+                {% block dynamicmain %}
+
+                {% endblock %}
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+    <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+        onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+    <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+
+    <!-- Bootstrap Modal Container for UI Components -->
+    <div class="modal" id="componentModal" tabindex="-1" aria-labelledby="componentModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content" id="modal-container">
+                <!-- Modal content will be loaded here via HTMX -->
+                <div class="modal-header">
+                    <h5 class="modal-title">Loading...</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container (positioned fixed) -->
+    <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1055;">
+        <!-- Toasts will be dynamically added here -->
+    </div>
+
+
+
+
+
+    <!-- Initialize Feather Icons -->
+    <script>
+        // Initialize Feather icons on page load
+        feather.replace();
+
+        // Re-initialize Feather icons after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            feather.replace();
+        });
+
+        // Auto-dismiss Bootstrap toasts
+        document.body.addEventListener('htmx:afterSwap', function (event) {
+            if (event.target.id === 'toast-container') {
+                const toasts = event.target.querySelectorAll('.toast');
+                toasts.forEach(toast => {
+                    const bsToast = new bootstrap.Toast(toast, { delay: 5000 });
+                    bsToast.show();
+                });
+            }
+        });
+
+        // File upload drag and drop
+        document.getElementById('file-upload-area')?.addEventListener('click', function () {
+            document.getElementById('file-input').click();
+        });
+
+        document.getElementById('file-input')?.addEventListener('change', function (event) {
+            if (event.target.files.length > 0) {
+                // Trigger HTMX file upload
+                htmx.trigger(document.getElementById('file-upload-area'), 'htmx:trigger');
+            }
+        });
+    </script>
+
+    {% htmx_debug %}
+
+    {% bootstrap_javascript %}
+</body>
+
+</html>

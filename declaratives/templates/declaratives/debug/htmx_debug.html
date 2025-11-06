@@ -1,0 +1,293 @@
+{% load static %}
+{% load htmx_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTMX Debug Console</title>
+    
+    <!-- HTMX Configuration -->
+    {% htmx_headers %}
+    {% htmx_config timeout=15000 defaultSwapDelay=100 %}
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/all.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/styles.css' %}">
+    
+    <!-- JavaScript Files -->
+    <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+    
+    <style>
+        .debug-console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+        
+        .debug-event {
+            border-bottom: 1px solid #444;
+            padding: 0.5rem 0;
+        }
+        
+        .debug-event:last-child {
+            border-bottom: none;
+        }
+        
+        .event-type {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+        
+        .event-detail {
+            color: #a5d6a7;
+            margin-left: 1rem;
+        }
+        
+        .event-error {
+            color: #f48fb1;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="mb-0">🔧 HTMX Debug Console</h1>
+                        <p class="text-muted mb-0">Real-time HTMX event monitoring and debugging</p>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger" onclick="clearDebugLog()">
+                            <i class="fas fa-trash"></i> Clear Log
+                        </button>
+                        <button class="btn btn-secondary" onclick="toggleDebug()">
+                            <i class="fas fa-power-off"></i> Toggle Debug
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Statistics -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0" id="request-count">0</h3>
+                        <small>Total Requests</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0" id="success-count">0</h3>
+                        <small>Successful</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0" id="error-count">0</h3>
+                        <small>Errors</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white">
+                    <div class="card-body text-center">
+                        <h3 class="mb-0" id="avg-response-time">0ms</h3>
+                        <small>Avg Response</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Buttons -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🧪 Test HTMX Requests</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group me-2" role="group">
+                            <button class="btn btn-primary"
+                                    {% htmx_get "/declaratives/component/charts/live-stats/" %}
+                                    {% htmx_target "#test-output" %}>
+                                📊 Live Stats
+                            </button>
+                            <button class="btn btn-success"
+                                    {% htmx_get "/declaratives/component/table/data/" %}
+                                    {% htmx_target "#test-output" %}>
+                                📋 Table Data
+                            </button>
+                            <button class="btn btn-warning"
+                                    {% htmx_get "/declaratives/component/realtime/activity/" %}
+                                    {% htmx_target "#test-output" %}>
+                                🔄 Activity Feed
+                            </button>
+                            <button class="btn btn-info"
+                                    {% htmx_post "/declaratives/component/ui/toast/" %}
+                                    {% htmx_vals '{"message": "Debug test message", "type": "info"}' %}
+                                    {% htmx_target "#test-output" %}>
+                                💬 Toast Message
+                            </button>
+                        </div>
+                        <button class="btn btn-danger"
+                                {% htmx_get "/declaratives/nonexistent-endpoint/" %}
+                                {% htmx_target "#test-output" %}>
+                            ❌ Error Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Output -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">📊 Debug Log</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="debug-log" class="debug-console">
+                            <div class="debug-event">
+                                <span class="event-type">[INFO]</span>
+                                <span class="event-detail">HTMX Debug Console Initialized</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">🎯 Test Output</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="test-output">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-flask fa-3x mb-3"></i>
+                                <p>Click test buttons to see output here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        // Debug statistics
+        let stats = {
+            requests: 0,
+            success: 0,
+            errors: 0,
+            responseTimes: []
+        };
+
+        // Enable HTMX debug logging
+        htmx.logger = function(elt, event, data) {
+            logDebugEvent(event, data, elt);
+        };
+
+        function logDebugEvent(event, data, element) {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let eventClass = 'event-detail';
+            if (event.includes('error') || event.includes('Error')) {
+                eventClass = 'event-error';
+            }
+            
+            const eventDiv = document.createElement('div');
+            eventDiv.className = 'debug-event';
+            eventDiv.innerHTML = `
+                <span class="event-type">[${timestamp}]</span>
+                <span class="${eventClass}">${event}</span>
+                ${data ? '<br><span class="event-detail">' + JSON.stringify(data, null, 2) + '</span>' : ''}
+            `;
+            
+            debugLog.appendChild(eventDiv);
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+
+        // Track HTMX events for statistics
+        document.body.addEventListener('htmx:beforeRequest', function(event) {
+            stats.requests++;
+            event.detail.requestStart = Date.now();
+            updateStats();
+        });
+
+        document.body.addEventListener('htmx:afterRequest', function(event) {
+            const responseTime = Date.now() - event.detail.requestStart;
+            stats.responseTimes.push(responseTime);
+            
+            if (event.detail.successful) {
+                stats.success++;
+            } else {
+                stats.errors++;
+            }
+            updateStats();
+        });
+
+        function updateStats() {
+            document.getElementById('request-count').textContent = stats.requests;
+            document.getElementById('success-count').textContent = stats.success;
+            document.getElementById('error-count').textContent = stats.errors;
+            
+            if (stats.responseTimes.length > 0) {
+                const avgTime = Math.round(stats.responseTimes.reduce((a, b) => a + b, 0) / stats.responseTimes.length);
+                document.getElementById('avg-response-time').textContent = avgTime + 'ms';
+            }
+        }
+
+        function clearDebugLog() {
+            document.getElementById('debug-log').innerHTML = `
+                <div class="debug-event">
+                    <span class="event-type">[INFO]</span>
+                    <span class="event-detail">Debug log cleared</span>
+                </div>
+            `;
+            
+            // Reset stats
+            stats = { requests: 0, success: 0, errors: 0, responseTimes: [] };
+            updateStats();
+        }
+
+        function toggleDebug() {
+            if (htmx.logger === console.log) {
+                htmx.logger = function(elt, event, data) {
+                    logDebugEvent(event, data, elt);
+                };
+                logDebugEvent('INFO', 'Custom debug logging enabled');
+            } else {
+                htmx.logger = console.log;
+                console.log('HTMX debug logging switched to console');
+            }
+        }
+
+        // Initial log
+        logDebugEvent('INFO', 'HTMX Debug Console ready! Test buttons above to see debug events.');
+    </script>
+</body>
+</html>

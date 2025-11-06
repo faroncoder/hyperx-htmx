@@ -1,0 +1,78 @@
+{
+  "title": "HTMX Cheat Sheet",
+  "version": "1.9+",
+  "last_updated": "2025-10-31",
+  "sections": [
+    {
+      "name": "Core Attributes",
+      "items": [
+        {"attr": "hx-get", "desc": "Perform a GET request and swap response HTML."},
+        {"attr": "hx-post", "desc": "POST form data to the specified URL."},
+        {"attr": "hx-put / hx-patch / hx-delete", "desc": "Use REST-style verbs for resource updates or deletion."},
+        {"attr": "hx-target", "desc": "Selector of element whose content will be replaced by response."},
+        {"attr": "hx-swap", "desc": "Controls how HTML is inserted: innerHTML, outerHTML, beforebegin, afterend, transition:true."},
+        {"attr": "hx-trigger", "desc": "Event(s) that trigger request: click, change, keyup changed delay:300ms, revealed."},
+        {"attr": "hx-push-url", "desc": "Push response URL into browser history when true."},
+        {"attr": "hx-confirm", "desc": "Display a confirmation dialog before sending request."},
+        {"attr": "hx-indicator", "desc": "Show/hide a spinner or indicator during request."},
+        {"attr": "hx-vals", "desc": "Add extra parameters dynamically, e.g. hx-vals='js:{id:123}'."}
+      ]
+    },
+    {
+      "name": "Response Handling",
+      "items": [
+        {"attr": "hx-swap-oob", "desc": "Perform an out-of-band swap (update other parts of DOM)."},
+        {"attr": "HX-Redirect", "desc": "Response header to redirect client to new URL."},
+        {"attr": "HX-Trigger", "desc": "Response header to fire a client-side event after request."},
+        {"attr": "HX-Refresh", "desc": "Response header to force a full page reload."}
+      ]
+    },
+    {
+      "name": "Extensions",
+      "items": [
+        {"attr": "json-enc", "desc": "Encode form as JSON instead of x-www-form-urlencoded."},
+        {"attr": "ws", "desc": "WebSocket extension for bidirectional communication."},
+        {"attr": "sse", "desc": "Server-Sent Events extension for live streaming updates."},
+        {"attr": "morphdom", "desc": "Smart DOM diff/patch swapping for smooth transitions."},
+        {"attr": "client-side-templates", "desc": "Render JSON using Mustache or Handlebars directly in the client."},
+        {"attr": "path-deps", "desc": "Load specific scripts/styles depending on URL path."},
+        {"attr": "history-restore", "desc": "Improve browser back/forward navigation restoration."}
+      ]
+    },
+    {
+      "name": "Advanced Controls",
+      "items": [
+        {"attr": "hx-sync", "desc": "Coordinate or cancel concurrent requests, e.g. hx-sync='closest form:abort'."},
+        {"attr": "hx-include", "desc": "Include additional form fields or elements in request payload."},
+        {"attr": "hx-on", "desc": "Inline JS event hooks, e.g. hx-on::after-request='alert(\"done\")'."},
+        {"attr": "hx-history", "desc": "Exclude a request from browser history (false to disable)."},
+        {"attr": "hx-preserve", "desc": "Preserve element content across swaps."},
+        {"attr": "htmx.trigger()", "desc": "Programmatically trigger HTMX events in JS."}
+      ]
+    },
+    {
+      "name": "Events",
+      "items": [
+        {"attr": "htmx:beforeRequest", "desc": "Before a request is initiated."},
+        {"attr": "htmx:afterRequest", "desc": "After request completes (before swap)."},
+        {"attr": "htmx:beforeSwap", "desc": "Before new content is swapped into DOM."},
+        {"attr": "htmx:afterSwap", "desc": "After content has been inserted into DOM."},
+        {"attr": "htmx:configRequest", "desc": "Intercept and modify outgoing request dynamically."},
+        {"attr": "htmx:responseError", "desc": "Fired when response status is error."}
+      ]
+    },
+    {
+      "name": "Performance & UX",
+      "items": [
+        {"attr": "hx-trigger='revealed'", "desc": "Lazy-load element when it enters viewport."},
+        {"attr": "hx-boost", "desc": "Make normal links/forms use HTMX automatically."},
+        {"attr": "hx-swap='transition:true'", "desc": "Enable transition animations for swaps."},
+        {"attr": "hx-disabled-elt", "desc": "Auto-disable elements during request."}
+      ]
+    }
+  ],
+  "footer": {
+    "note": "Updated for HTMX v1.9+ (includes json-enc, ws, sse, morphdom).",
+    "credits": "© 2025 SignaVision Solutions Inc. | HyperX-HTMX Reference"
+  }
+}

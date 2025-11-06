@@ -1,0 +1,345 @@
+{% load static %}
+{% load htmx_tags %}
+{% load django_bootstrap5 %} 
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html> 
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    
+  <script type="text/javascript" src="{% static 'js/htmx.min.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/json_enc.js' %}"></script>
+  <script type ="text/javascript" src="{% static 'js/ws.js' %}"></script>
+  
+  <link type="text/css" href="{% static 'css/simple_datatable.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/all.min.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/styles.css' %}" rel="stylesheet" />
+  <link type="text/css" href="{% static 'css/default.css' %}" rel="stylesheet" />
+
+    <!-- Feather Icons -->
+
+      <script type ="text/javascript" src="{% static 'js/feather.min.js' %}"></script>
+        <script type ="text/javascript" src="{% static 'js/loader.js' %}"></script>
+
+</head>
+<body>
+
+<!-- Dynamic Forms Component -->
+<div class="row">
+    <!-- User Profile Form -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">User Profile Form</h5>
+                <small class="text-muted">Dynamic validation and real-time feedback</small>
+            </div>
+            <div class="card-body">
+                <form id="profile-form"
+                      {% htmx_post '/declaratives/component/forms/profile/' %}
+                      {% htmx_target '#profile-form-container' %}
+                      {% htmx_swap 'innerHTML' %}
+                      hx-indicator="#profile-spinner">
+                    
+                    <div id="profile-form-container">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   {% htmx_post '/declaratives/component/forms/validate-field/' %}
+                                   {% htmx_params 'field=username' %}
+                                   {% htmx_trigger 'blur' %}
+                                   {% htmx_target '#username-feedback' %}
+                                   {% htmx_swap 'innerHTML' %}
+                                   value="{{ form.username.value|default:'' }}"
+                                   placeholder="Enter username">
+                            <div id="username-feedback" class="form-text">
+                                {% if form.username.errors %}
+                                    {% for error in form.username.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% else %}
+                                    Username must be 3-20 characters long
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email"
+                                   {% htmx_post '/declaratives/component/forms/validate-field/' %}
+                                   {% htmx_params 'field=email' %}
+                                   {% htmx_trigger 'blur' %}
+                                   {% htmx_target '#email-feedback' %}
+                                   {% htmx_swap 'innerHTML' %}
+                                   value="{{ form.email.value|default:'' }}"
+                                   placeholder="Enter email address">
+                            <div id="email-feedback" class="form-text">
+                                {% if form.email.errors %}
+                                    {% for error in form.email.errors %}
+                                        <div class="text-danger">{{ error }}</div>
+                                    {% endfor %}
+                                {% else %}
+                                    We'll check if this email is available
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="first_name" name="first_name"
+                                   value="{{ form.first_name.value|default:'' }}"
+                                   placeholder="Enter first name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="last_name" name="last_name"
+                                   value="{{ form.last_name.value|default:'' }}"
+                                   placeholder="Enter last name">
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="bio" class="form-label">Bio</label>
+                            <textarea class="form-control" id="bio" name="bio" rows="3"
+                                      {% htmx_trigger 'keyup changed delay:500ms' %}
+                                      {% htmx_target '#bio-counter' %}
+                                      {% htmx_get '/declaratives/component/forms/char-counter/' %}
+                                      {% htmx_params 'field=bio' %}
+                                      placeholder="Tell us about yourself...">{{ form.bio.value|default:'' }}</textarea>
+                            <div id="bio-counter" class="form-text">
+                                <span class="text-muted">{{ form.bio.value|length|default:0 }}/500 characters</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="country" class="form-label">Country</label>
+                            <select class="form-select" id="country" name="country"
+                                    {% htmx_get '/declaratives/component/forms/cities/' %}
+                                    {% htmx_trigger 'change' %}
+                                    {% htmx_target '#city-container' %}
+                                    {% htmx_swap 'innerHTML' %}>
+                                <option value="">Select country...</option>
+                                <option value="US" {% if form.country.value == 'US' %}selected{% endif %}>United States</option>
+                                <option value="CA" {% if form.country.value == 'CA' %}selected{% endif %}>Canada</option>
+                                <option value="UK" {% if form.country.value == 'UK' %}selected{% endif %}>United Kingdom</option>
+                                <option value="DE" {% if form.country.value == 'DE' %}selected{% endif %}>Germany</option>
+                                <option value="FR" {% if form.country.value == 'FR' %}selected{% endif %}>France</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="city-container">
+                            <label for="city" class="form-label">City</label>
+                            <select class="form-select" id="city" name="city" disabled>
+                                <option value="">Select country first...</option>
+                            </select>
+                        </div>
+
+                        {% if messages %}
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                {% for message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div id="profile-spinner" class="htmx-indicator">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2">Reset</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i data-feather="save"></i> Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Add Task Form -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Quick Add Task</h5>
+                <small class="text-muted">Add tasks with instant feedback</small>
+            </div>
+            <div class="card-body">
+                <form {% htmx_post '/declaratives/component/forms/task/' %}
+                      {% htmx_target '#task-list' %}
+                      {% htmx_swap 'afterbegin' %}
+                      {% htmx_on 'htmx:afterRequest' 'this.reset()' %}>
+                    
+                    <div class="mb-3">
+                        <label for="task_title" class="form-label">Task Title</label>
+                        <input type="text" class="form-control" id="task_title" name="title"
+                               placeholder="Enter task title..." required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="task_priority" class="form-label">Priority</label>
+                        <select class="form-select" id="task_priority" name="priority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="urgent">Urgent</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="task_due_date" class="form-label">Due Date (Optional)</label>
+                        <input type="datetime-local" class="form-control" id="task_due_date" name="due_date">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="task_tags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="task_tags" name="tags"
+                               {% htmx_get '/declaratives/component/forms/tag-suggestions/' %}
+                               {% htmx_trigger 'keyup changed delay:300ms' %}
+                               {% htmx_target '#tag-suggestions' %}
+                               {% htmx_params 'q=' %}
+                               placeholder="Enter tags separated by commas...">
+                        <div id="tag-suggestions" class="mt-2"></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100">
+                        <i data-feather="plus"></i> Add Task
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recently Added Tasks -->
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">Recent Tasks</h6>
+                <button class="btn btn-sm btn-outline-secondary"
+                        {% htmx_get '/declaratives/component/forms/recent-tasks/' %}
+                        {% htmx_target '#task-list' %}
+                        {% htmx_swap 'innerHTML' %}>
+                    <i data-feather="refresh-cw"></i>
+                </button>
+            </div>
+            <div class="card-body p-0">
+                <div id="task-list" class="list-group list-group-flush">
+                    <!-- Tasks will be dynamically loaded here -->
+                    <div class="list-group-item text-center py-4 text-muted">
+                        <i data-feather="clipboard"></i>
+                        <div>No tasks yet</div>
+                        <small>Add your first task above</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Dynamic Content Examples -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Dynamic Content Examples</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Conditional Fields -->
+                    <div class="col-md-4">
+                        <h6>Conditional Fields</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Account Type</label>
+                            <select class="form-select"
+                                    {% htmx_get '/declaratives/component/forms/conditional-fields/' %}
+                                    {% htmx_trigger 'change' %}
+                                    {% htmx_target '#conditional-container' %}
+                                    name="account_type">
+                                <option value="">Select type...</option>
+                                <option value="personal">Personal</option>
+                                <option value="business">Business</option>
+                                <option value="enterprise">Enterprise</option>
+                            </select>
+                        </div>
+                        <div id="conditional-container">
+                            <!-- Dynamic fields will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Real-time Preview -->
+                    <div class="col-md-4">
+                        <h6>Real-time Preview</h6>
+                        <div class="mb-3">
+                            <label class="form-label">Color Theme</label>
+                            <input type="color" class="form-control form-control-color" 
+                                   {% htmx_get '/declaratives/component/forms/color-preview/' %}
+                                   {% htmx_trigger 'input' %}
+                                   {% htmx_target '#color-preview' %}
+                                   name="theme_color" value="#007bff">
+                        </div>
+                        <div id="color-preview" class="border rounded p-3 text-center">
+                            <div class="bg-primary text-white rounded p-2">
+                                Preview Theme
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auto-save Demo -->
+                    <div class="col-md-4">
+                        <h6>Auto-save Notes</h6>
+                        <textarea class="form-control" rows="4"
+                                  {% htmx_post '/declaratives/component/forms/autosave/' %}
+                                  {% htmx_trigger 'keyup changed delay:1000ms' %}
+                                  {% htmx_target '#autosave-status' %}
+                                  {% htmx_swap 'innerHTML' %}
+                                  placeholder="Start typing... auto-saves after 1 second"></textarea>
+                        <div id="autosave-status" class="form-text mt-2">
+                            <span class="text-muted">Start typing to see auto-save in action</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+  <script type="text/javascript" src="{% static 'js/htmx_client.js' %}" defer></script>
+  <script type="text/javascript" src="{% static 'js/localStorage.min.js' %}" id="localStorageScript"
+    onload="window.localStorageReady = true; console.log('✅ localStorage.min.js loaded');"></script>
+  <script type="text/javascript" src="{% static 'js/bootstrap.bundle.min.js' %}"></script> 
+  <script type="text/javascript" src="{% static 'js/base_start.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/toasts.js' %}"></script>
+
+
+<script>
+// Re-initialize Feather icons after form updates
+document.body.addEventListener('htmx:afterSwap', function(event) {
+    feather.replace();
+});
+
+// Form reset functionality
+document.addEventListener('click', function(event) {
+    if (event.target.textContent.trim() === 'Reset') {
+        const form = event.target.closest('form');
+        if (form) {
+            form.reset();
+            // Clear any validation feedback
+            form.querySelectorAll('[id$="-feedback"]').forEach(feedback => {
+                feedback.innerHTML = '';
+            });
+        }
+    }
+});
+</script>
+
+
+{% bootstrap_javascript %}
+</body>
+</html>

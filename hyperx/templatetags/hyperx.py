@@ -6,12 +6,14 @@ Auto-includes Bootstrap, static, and runtime helpers.
 """
 from django import template
 register = template.Library()
-from hyperx.bin.cli.logger.hx_logger import load_logger
-from hyperx.core.hx.hx_converter import register_hx_tag
-from hyperx.core.hx.hx_actions_rules import build_htmx_attrs
+from hyperx.logger.hx_logger import load_logger
+from hyperx.hx.hx_converter import register_hx_tag
+from hyperx.hx.hx_actions_rules import build_htmx_attrs
 from django.utils.html import escape
 import json
 import hashlib
+from django.conf import settings
+from django.template import engines
 
 from django import template
 from django.conf import settings
@@ -21,13 +23,17 @@ from django.template.loader import render_to_string
 from django.template import engines
 from django.template.library import import_library
 from bs4 import BeautifulSoup
-
-
+from hyperx.elements.generic import convert_generic 
+from hyperx.bootstrap.bs_loader import initialize as bootstrap_initialize
 
 _logger = load_logger("hyperx.templatetags.hyperx")
 _logger.info("hyperx.templatetags.hyperx initializing")
 
-from  hyperx.core.hx.hx_converter import register_hx_tag, TAG_CONVERTERS
+from hyperx.hx.hx_actions_rules import build_htmx_attrs
+from hyperx.hx.hx_converter import register_hx_tag
+from hyperx.hx.hx_runtime_compiler import HyperXCompiler
+from hyperx.loader.hx_loader import register_libraries 
+from hyperx.hx.hx_converter import TAG_CONVERTERS
 
 
 
@@ -36,14 +42,7 @@ register = template.Library()
 
 # autodiscover("hyperx.templatetags")
 
-_logger.info("hyperx.templatetags modules autodiscovered")
-
-
-# from hyperx.core.hx.hx_converter import register_hx_tag, TAG_CONVERTERS
-# from hyperx.core.hx.hx_runtime_compiler import HyperXCompiler
-# from hyperx.templatetags.hyperx_elements.generic import convert_generic
-
-
+_logger.info("templatetags modules autodiscovered")
 
 
 
@@ -57,40 +56,46 @@ def static(path):
 
 # Register 'load static' so it's available when 'load hyperx' is used
 
-engines['django'].engine.template_libraries['static'] = 'django.templatetags.static'
-_logger.info("[HyperX] Django 'static' tag registered") 
-
-
-try:
-    bootstrap_lib = import_library("django_bootstrap5")
-    _logger.info("[HyperX] Bootstrap5 (django-bootstrap5) detected")
-except Exception:
-    _logger.warning("[HyperX] django-bootstrap5 not found, trying django-bootstrap4...")
+# Register 'load static' so it's available when 'load hyperx' is used
+if settings.configured:
     try:
-        bootstrap_lib = import_library("django_bootstrap4   ")
-        _logger.info("[HyperX] Bootstrap4 (django-bootstrap4) detected")
+        engines['django'].engine.template_libraries['static'] = 'django.templatetags.static'
+        _logger.info("[HyperX] Django 'static' tag registered")
+    except Exception as e:
+        _logger.warning(f"[HyperX] Could not register 'static' tag: {e}")
+
+    try:
+        bootstrap_lib = import_library("django_bootstrap5")
+        _logger.info("[HyperX] Bootstrap5 (django-bootstrap5) detected")
     except Exception:
-        bootstrap_lib = None
-        _logger.warning("[HyperX] django-bootstrap5 and django-bootstrap4 not found, Bootstrap tags unavailable")
+        _logger.warning("[HyperX] django-bootstrap5 not found, trying django-bootstrap4...")
+        try:
+            bootstrap_lib = import_library("django_bootstrap4")
+            _logger.info("[HyperX] Bootstrap4 (django-bootstrap4) detected")
+        except Exception:
+            bootstrap_lib = None
+            _logger.warning("[HyperX] django-bootstrap5 and django-bootstrap4 not found, Bootstrap tags unavailable")
 
-if bootstrap_lib:
-    for n, t in getattr(bootstrap_lib, "tags", {}).items():
-        register.tag(n, t)
-        tags = getattr(t, "tags", [])
-        for tag in tags:
-            register.tag(tag, getattr(t, tag))
-            _logger.info(f"[HyperX] Bootstrap5 tag '{tag}' registered")
+    if bootstrap_lib:
+        for n, t in getattr(bootstrap_lib, "tags", {}).items():
+            register.tag(n, t)
+            tags = getattr(t, "tags", [])
+            for tag in tags:
+                register.tag(tag, getattr(t, tag))
+                _logger.info(f"[HyperX] Bootstrap tag '{tag}' registered")
 
-    for n, f in getattr(bootstrap_lib, "filters", {}).items():
-        register.filter(n, f)
-        filters = getattr(f, "filters", [])
-        for flt in filters:
-            register.filter(flt, getattr(f, flt))
-            _logger.info(f"[HyperX] Bootstrap5 filter '{flt}' registered")
+        for n, f in getattr(bootstrap_lib, "filters", {}).items():
+            register.filter(n, f)
+            filters = getattr(f, "filters", [])
+            for flt in filters:
+                register.filter(flt, getattr(f, flt))
+                _logger.info(f"[HyperX] Bootstrap filter '{flt}' registered")
 
-    _logger.info("[HyperX] Bootstrap5 tags merged")
+        _logger.info("[HyperX] Bootstrap tags merged")
+    else:
+        _logger.warning("[HyperX] Bootstrap not found")
 else:
-    _logger.warning("[HyperX] Bootstrap5 not found")
+    _logger.debug("[HyperX] Django settings not configured; skipping static and Bootstrap tag registration.")
 
 # ─────────────────────────────────────────────
 #  Tag converter registry
@@ -126,6 +131,9 @@ def do_hx(parser, token):
     parser.delete_first_token()
     return HXNode(nodelist, debug)
 
+
+
+
 class HXNode(template.Node):
     def __init__(self, nodelist, debug=False):
         self.nodelist, self.debug = nodelist, debug
@@ -155,8 +163,8 @@ def hx_runtime_scripts():
         static("hxjs/loader.js"),
         static("hxjs/dragdrop.js"),
         static("hxjs/drawer.js"),
-        static("js/hyperx-events.js"),
-        static("js/hyperx-core.js"),
+        static("hxjs/hyperx-events.js"),
+        static("hxjs/hyperx-core.js"),
     ]
     tags = "\n".join(f'<script type="module" src="{src}"></script>' for src in scripts)
     return mark_safe(tags)
