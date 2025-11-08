@@ -472,3 +472,84 @@ def do_hx_tabs(parser, token):
 
 
 
+
+class HXEntityTabsNode(Node):
+    def __init__(self, nodelist, tabset_id, target, entities):
+        self.nodelist = nodelist
+        self.tabset_id = tabset_id
+        self.target = target
+        self.entities = entities
+
+    def render(self, context):
+        raw = self.nodelist.render(context)
+        import re, json
+        entity_list = []
+
+        # If entities passed via context variable
+        if hasattr(self.entities, 'resolve'):
+            resolved = self.entities.resolve(context)
+            if isinstance(resolved, (list, tuple)):
+                entity_list = resolved
+            elif isinstance(resolved, str):
+                try:
+                    entity_list = json.loads(resolved)
+                except Exception:
+                    entity_list = [e.strip() for e in resolved.split(',') if e.strip()]
+        else:
+            entity_list = [e.strip() for e in str(self.entities).split(',') if e.strip()]
+
+        if not entity_list:
+            # No entities? Render fallback content.
+            return raw
+
+        target = self.target.resolve(context)
+        tabset_id = self.tabset_id.resolve(context)
+
+        html = [f'<ul class="nav nav-pills mb-3" id="{tabset_id}" role="tablist">']
+        first_entity = entity_list[0]
+        for idx, entity in enumerate(entity_list):
+            active = "active" if idx == 0 else ""
+            html.append(
+                f'<li class="nav-item">'
+                f'<a class="nav-link {active}" '
+                f'hx-get="/entity/{entity}/" '
+                f'hx-target="{target}" '
+                f'hx-swap="innerHTML">{entity.title()}</a></li>'
+            )
+        html.append('</ul>')
+
+        # auto-load first entity into target
+        target_id = target.lstrip("#")
+        html.append(
+            f'<div id="{target_id}" class="entity-content">'
+            f'<div hx-get="/entity/{first_entity}/" hx-trigger="load" hx-target="{target}" hx-swap="innerHTML"></div>'
+            f'</div>'
+        )
+
+        return "".join(html)
+
+
+@register.tag(name="hx_entitytabs")
+def do_hx_entitytabs(parser, token):
+    """
+    Declarative sub-tab system for entity-level navigation.
+    Usage:
+        {% hx_entitytabs id="overview-entities" target="#extended_content" entities=ctx.entities %}
+            <div>Fallback content if no entities</div>
+        {% endhx_entitytabs %}
+    """
+    bits = token.split_contents()
+    kwargs = {}
+    for bit in bits[1:]:
+        key, val = bit.split("=", 1)
+        kwargs[key] = parser.compile_filter(val)
+
+    nodelist = parser.parse(("endhx_entitytabs",))
+    parser.delete_first_token()
+
+    return HXEntityTabsNode(
+        nodelist,
+        tabset_id=kwargs.get("id"),
+        target=kwargs.get("target"),
+        entities=kwargs.get("entities"),
+    )
