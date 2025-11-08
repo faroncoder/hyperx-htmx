@@ -374,3 +374,101 @@ def htmx_tabs(context, tabs, target="#extended_content", default=None, base_url=
         "request": context.get("request"),
     }
 
+
+
+
+from django.template import Library, Node, TemplateSyntaxError
+from django.utils.html import escape
+
+class HXTabsNode(Node):
+    def __init__(self, nodelist, tabset_id, target, default):
+        self.nodelist = nodelist
+        self.tabset_id = tabset_id
+        self.target = target
+        self.default = default
+
+    def render(self, context):
+        raw = self.nodelist.render(context)
+        # Parse <hx:tab .../> definitions
+        import re
+        tab_pattern = re.compile(r'<hx:tab\s+([^>]+?)/?>', re.IGNORECASE)
+        tabs = []
+        for match in tab_pattern.findall(raw):
+            attrs = dict(re.findall(r'(\w+)="([^"]+)"', match))
+            tabs.append(attrs)
+
+        target = self.target.resolve(context)
+        tabset_id = self.tabset_id.resolve(context)
+        default = self.default.resolve(context) if self.default else (tabs[0]["name"] if tabs else "")
+
+        # Build tab markup
+        html = [f'<ul class="nav nav-tabs" id="{tabset_id}">']
+        for tab in tabs:
+            name = escape(tab.get("name"))
+            label = escape(tab.get("label", name.title()))
+            active = "active" if name == default else ""
+            html.append(
+                f'<li class="nav-item">'
+                f'<a class="nav-link {active}" '
+                f'hx-get="/tab/{name}/" '
+                f'hx-target="{target}" '
+                f'hx-swap="innerHTML">{label}</a></li>'
+            )
+        html.append("</ul>")
+
+        # Content container
+        target_id = target.lstrip("#")
+        html.append(
+            f'<div id="{target_id}" class="mt-3">'
+            f'<div hx-get="/tab/{default}/" hx-trigger="load" '
+            f'hx-target="{target}" hx-swap="innerHTML"></div>'
+            f'</div>'
+        )
+
+        # Auto-update active class after swap
+        html.append(f"""
+        <script>
+        document.body.addEventListener('htmx:afterSwap', (e) => {{
+          if (e.detail.target.id === '{target_id}') {{
+            document.querySelectorAll('#{tabset_id} .nav-link').forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`#{{tabset_id}} .nav-link[hx-get="{{e.detail.xhr.responseURL}}"]`);
+            if (link) link.classList.add('active');
+          }}
+        }});
+        </script>
+        """)
+        return "".join(html)
+
+
+@register.tag(name="hx_tabs")
+def do_hx_tabs(parser, token):
+    """
+    Declarative <hx:tabs> block tag parser.
+    Usage:
+        {% hx_tabs id="main-tabs" target="#extended_content" default="overview" %}
+            <hx:tab name="overview" label="Overview" />
+            <hx:tab name="reports" label="Reports" />
+        {% endhx_tabs %}
+    """
+    bits = token.split_contents()
+    tag_name = bits[0]
+    kwargs = {}
+    for bit in bits[1:]:
+        key, val = bit.split("=", 1)
+        kwargs[key] = parser.compile_filter(val)
+
+    nodelist = parser.parse(("endhx_tabs",))
+    parser.delete_first_token()
+
+    if "id" not in kwargs or "target" not in kwargs:
+        raise TemplateSyntaxError(f"{tag_name} requires id and target attributes")
+
+    return HXTabsNode(
+        nodelist,
+        tabset_id=kwargs["id"],
+        target=kwargs["target"],
+        default=kwargs.get("default"),
+    )
+
+
+
