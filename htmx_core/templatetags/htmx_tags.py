@@ -348,3 +348,29 @@ def htmx_select_oob(selector):
 def htmx_timeout(timeout):
     """Generate hx-timeout attribute"""
     return mark_safe(f'hx-timeout="{timeout}"')
+
+
+@register.inclusion_tag("htmx_core/partials/htmx_tabs.html", takes_context=True)
+def htmx_tabs(context, tabs, target="#extended_content", default=None, base_url="/tab/"):
+    """
+    Render an HTMX tab system with HyperX compatibility.
+    
+    Example:
+        {% htmx_tabs tabs="overview,reports,settings,activity" target="#extended_content" %}
+    """
+    if isinstance(tabs, str):
+        tab_list = [t.strip() for t in tabs.split(",")]
+    else:
+        tab_list = tabs
+
+    # Normalize default tab
+    default_tab = default or (tab_list[0] if tab_list else None)
+
+    return {
+        "tabs": tab_list,
+        "target": target,
+        "default_tab": default_tab,
+        "base_url": base_url,
+        "request": context.get("request"),
+    }
+
